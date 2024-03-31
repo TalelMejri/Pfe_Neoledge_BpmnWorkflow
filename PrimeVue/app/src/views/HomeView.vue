@@ -11,13 +11,14 @@
       <div ref="content" class="containers">
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
-      <div class="card_error" >
+      <div class="card_error">
         Problems({{ errors.length }})
         <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
           @click="visibleErrors = !visibleErrors" />
       </div>
       <Sidebar class="panel" v-model:visible="visibleRight" header="Neoledge Panel" position="right">
-          <MainPanelComponent :element="element"></MainPanelComponent>
+        <MainPanelComponent @updateActivityName="updateActivityName" :element="element"
+          :bpmnElementfactory="bpmnElementfactory"></MainPanelComponent>
       </Sidebar>
     </div>
   </div>
@@ -39,7 +40,7 @@ import TokenSimulationModule from 'bpmn-js-token-simulation/lib/modeler.js';
 import { toggleMode } from "../SimulationNeo/util.js"
 import WorkfloService from "../service/WorkfloService.js"
 import { createElement, AddElementComposer, DeleteElement, UpdateElement } from "../GererElement/utils.js";
-import { ref, onMounted, toRaw ,onBeforeMount } from 'vue';
+import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
 import ColorsBpm from "../colors/index";
 import Modeler from "bpmn-js/lib/Modeler.js";
 import gridModule from 'diagram-js-grid';
@@ -89,6 +90,15 @@ const initializeModeler = () => {
 const bindModelerEvents = () => {
   modeler.on('selection.changed', handleSelectionChange);
   modeler.on('element.changed', handleElementChange);
+};
+
+const updateActivityName = newName => {
+  if (element && element.value) {
+    const elementNew = bpmnElementRegistry.get(element.value[3]["id"]);
+    modeler.get('modeling').updateProperties(elementNew, { name: newName });
+  } else {
+    console.log('null');
+  }
 };
 
 const handleSelectionChange = (event) => {
@@ -252,10 +262,10 @@ img {
   padding: 1em;
 }
 
-.card_error{
+.card_error {
   position: absolute;
   bottom: 0;
-  padding: 5px; 
+  padding: 5px;
   width: 100%;
   text-align: center;
   border: 1px solid #f0f0f0;

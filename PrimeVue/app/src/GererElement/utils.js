@@ -15,8 +15,7 @@ export function AddElementComposer(
     typeName,
     name, value
 ) {
-
-    const businessObject = toRaw(element.value[3]);
+    const businessObject = toRaw(element[3]);
     let ItemParent = businessObject.get("extensionElements");
 
     if (!ItemParent) {
@@ -39,14 +38,14 @@ export function AddElementComposer(
         var ChildItemValue = createElement(TypeChildOfChild, {
             name: name, value: value
         }, bpmnFactory);
-    } else if(typeName=="source") {
+    } else if (typeName == "source") {
         var ChildItemValue = createElement(TypeChildOfChild, {
             source: name, target: value
         }, bpmnFactory);
-    }else{
+    } else {
         var ChildItemValue = createElement(TypeChildOfChild, {
             IdUser: name, comment: value
-        }, bpmnFactory); 
+        }, bpmnFactory);
     }
 
     ChildItem.get(ValuesChild).push(ChildItemValue);
@@ -62,7 +61,7 @@ export function DeleteElement(
     TypeChildOfChild,
     typeName
 ) {
-    const businessObject = toRaw(element.value[3]);
+    const businessObject = toRaw(element);
     let extensionElements = businessObject.get('extensionElements');
 
     var baseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
@@ -71,11 +70,11 @@ export function DeleteElement(
         baseElement.properties = [];
     } else if (valueChild == "values") {
         baseElement.values = [];
-    } else if(valueChild == "inputParameters") {
+    } else if (valueChild == "inputParameters") {
         baseElement.inputParameters = [];
-    }else if(valueChild == "outputParameters"){
+    } else if (valueChild == "outputParameters") {
         baseElement.outputParameters = [];
-    }else{
+    } else {
         baseElement.comments = [];
     }
 
@@ -103,14 +102,14 @@ export function DeleteElement(
                 }, bpmnFactory);
                 baseElement.get(valueChild).push(baseElementValue);
             }
-        } else if(typeName=="source") {
+        } else if (typeName == "source") {
             for (let i = 0; i < properties.length; i++) {
                 var baseElementValue = createElement(TypeChildOfChild, {
                     source: properties[i].name, target: properties[i].value
                 }, bpmnFactory);
                 baseElement.get(valueChild).push(baseElementValue);
             }
-        }else{
+        } else {
             for (let i = 0; i < properties.length; i++) {
                 var baseElementValue = createElement(TypeChildOfChild, {
                     IdUser: properties[i].IdUser, comment: properties[i].comment
@@ -123,8 +122,8 @@ export function DeleteElement(
 
 
 export function UpdateElement(element, TypeChild, ValuesChild, TypeName, name, value, newName, newValue) {
-    
-    const businessObject = toRaw(element.value[3]);
+
+    const businessObject = toRaw(element);
     let extensionElements = businessObject.get('extensionElements');
     let BaseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
 
