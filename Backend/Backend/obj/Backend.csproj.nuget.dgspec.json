@@ -1,0 +1,130 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\talel\\Desktop\\Pfe\\ProjetPfe\\Backend\\Backend\\Backend.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\talel\\Desktop\\Pfe\\ProjetPfe\\Backend\\Backend\\Backend.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\talel\\Desktop\\Pfe\\ProjetPfe\\Backend\\Backend\\Backend.csproj",
+        "projectName": "Backend",
+        "projectPath": "C:\\Users\\talel\\Desktop\\Pfe\\ProjetPfe\\Backend\\Backend\\Backend.csproj",
+        "packagesPath": "C:\\Users\\talel\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\talel\\Desktop\\Pfe\\ProjetPfe\\Backend\\Backend\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\talel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Elsa": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "Elsa.Activities.ControlFlow": {
+              "target": "Package",
+              "version": "[1.5.5.1943, )"
+            },
+            "Elsa.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "Elsa.Identity": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "Elsa.Liquid": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "Elsa.Quartz": {
+              "target": "Package",
+              "version": "[3.0.6, )"
+            },
+            "Elsa.Scheduling": {
+              "target": "Package",
+              "version": "[3.0.6, )"
+            },
+            "Elsa.Workflows.Api": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "IronPython": {
+              "target": "Package",
+              "version": "[3.4.1, )"
+            },
+            "IronPython.StdLib": {
+              "target": "Package",
+              "version": "[3.4.1, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[7.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[7.0.8, )"
+            },
+            "MySqlConnector": {
+              "target": "Package",
+              "version": "[2.3.6, )"
+            },
+            "Python.Runtime": {
+              "target": "Package",
+              "version": "[2.7.9, )"
+            },
+            "pythonnet": {
+              "target": "Package",
+              "version": "[3.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
