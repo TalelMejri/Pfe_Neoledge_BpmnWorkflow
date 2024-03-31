@@ -19,11 +19,11 @@
                     </Panel>
                     <Accordion class="accordion" :activeIndex="0">
                         <AccordionTab header="Extension Properties">
-                            <div class="card  mb-2" v-for="(prop, index) in properties" :key="index">
+                            <div class="card_extension mb-2" v-for="(prop, index) in properties" :key="index">
                                 <p>Name : {{ prop.name }}</p>
                                 <p>Value : {{ prop.value }}</p>
-                                <div class="d-flex gap-2 justify-content-center mb-2">
-                                    <Button class="btn" @click="deleteProperty(index)">Delete</Button>
+                                <div>
+                                    <Button class="btn danger" @click="deleteProperty(index)">Delete</Button>
                                     <Button class="btn edit" @click="showEditModal(index, prop.name, prop.value)">
                                         Edit</Button>
                                 </div>
@@ -48,9 +48,8 @@
 </template>
 
 <script>
-import { computed, ref, toRaw, defineComponent } from 'vue'
+import { computed, ref, toRaw, defineComponent, onMounted } from 'vue'
 import CommentComponent from './OptionsProperties/CommentComponent.vue';
-import Button from 'primevue/button';
 import { createElement, AddElementComposer, DeleteElement, UpdateElement } from "../../GererElement/utils.js";
 
 export default defineComponent({
@@ -67,25 +66,47 @@ export default defineComponent({
     components: {
         CommentComponent
     },
-    emits: ["updateActivityName"],
+    emits: ["updateActivityName", "DeleteProperties", "UpdateProperty"],
     setup(props, { emit }) {
+
         const name = ref(props.element[3]["name"]);
         const bpmnElementfactory = props.bpmnElementfactory;
         const id = ref(props.element[0]);
         const name_form = ref("")
+        const index = ref(0)
         const value_form = ref("")
         const showEdit = ref(false)
         const element = props.element;
         const properties = ref([])
+        onMounted(() => {
+            getAllProperties()
+        })
+        const getAllProperties = () => {
+            if (element[3]['extensionElements'] != undefined) {
+                if (element[3]['extensionElements']['values'] != undefined) {
+                    let test = element[3]['extensionElements']['values'].find((e) => e.$type == 'neo:Properties');
+                    if (test) {
+                        let tab = test['properties'];
+                        if (tab) {
+                            tab.forEach((val) => {
+                                properties.value.push({ name: val.name, value: val.value })
+                            })
+                        }
+                    }
+                }
+            }
+        }
 
         const ChangeName = () => {
             emit('updateActivityName', name.value)
         }
 
         const updateProperty = () => {
-            showEdit.value = false
-            const index = properties.findIndex(x => x.name == name_form.value)
-            properties[index].value = value_form.value
+            let OldName = properties.value[index.value].name;
+            let OldValue = properties.value[index.value].value;
+            properties.value[index.value].name = name_form.value;
+            properties.value[index.value].value = value_form.value;
+            emit("UpdateProperty", name_form.value, value_form.value, OldName, OldValue);
         }
 
         const AddProperties = () => {
@@ -102,7 +123,8 @@ export default defineComponent({
         }
 
         const deleteProperty = (index) => {
-            properties.splice(index, 1)
+            properties.value.splice(index, 1);
+            emit('DeleteProperties', properties.value);
         }
 
         const showEditModal = (index, name, value) => {
@@ -115,6 +137,7 @@ export default defineComponent({
             element,
             name,
             id,
+            index,
             name_form,
             value_form,
             showEdit,
@@ -123,7 +146,7 @@ export default defineComponent({
             updateProperty,
             AddProperties,
             deleteProperty,
-            showEditModal
+            showEditModal,
         }
     }
 })
@@ -170,5 +193,24 @@ export default defineComponent({
     color: white;
     border: none;
     padding: 4px;
+}
+
+.btn.danger {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 4px;
+}
+
+.card_extension {
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    margin-top: 10px;
+}
+
+.card_extension div {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
 }
 </style>

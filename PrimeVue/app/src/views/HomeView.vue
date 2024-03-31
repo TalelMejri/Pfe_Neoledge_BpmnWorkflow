@@ -12,13 +12,13 @@
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
       <div class="card_error">
-        Problems({{ errors.length }})
+        Problems ({{ errors.length }})
         <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
           @click="visibleErrors = !visibleErrors" />
       </div>
       <Sidebar class="panel" v-model:visible="visibleRight" header="Neoledge Panel" position="right">
-        <MainPanelComponent @updateActivityName="updateActivityName" :element="element"
-          :bpmnElementfactory="bpmnElementfactory"></MainPanelComponent>
+        <MainPanelComponent @updateActivityName="updateActivityName" :element="element" @updateProperty="updateProperty"
+          :bpmnElementfactory="bpmnElementfactory" @DeleteProperties="DeleteProperties"></MainPanelComponent>
       </Sidebar>
     </div>
   </div>
@@ -100,6 +100,32 @@ const updateActivityName = newName => {
     console.log('null');
   }
 };
+
+const DeleteProperties = (properties) => {
+  DeleteElement(
+    element,
+    'neo:Properties',
+    bpmnElementfactory,
+    "properties",
+    properties,
+    'neo:Property',
+    "name"
+  );
+};
+
+
+const updateProperty = (newName, NewValue, name, value) => {
+  UpdateElement(
+    element,
+    'neo:Properties',
+    "properties",
+    "name",
+    name,
+    value,
+    newName,
+    NewValue
+  );
+}
 
 const handleSelectionChange = (event) => {
   const selectedElement = event.newSelection[0];

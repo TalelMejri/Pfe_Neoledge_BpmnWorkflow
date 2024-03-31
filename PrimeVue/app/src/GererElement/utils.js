@@ -61,7 +61,8 @@ export function DeleteElement(
     TypeChildOfChild,
     typeName
 ) {
-    const businessObject = toRaw(element);
+    const businessObject = toRaw(element.value[3]);
+    console.log(businessObject);
     let extensionElements = businessObject.get('extensionElements');
 
     var baseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
@@ -123,7 +124,7 @@ export function DeleteElement(
 
 export function UpdateElement(element, TypeChild, ValuesChild, TypeName, name, value, newName, newValue) {
 
-    const businessObject = toRaw(element);
+    const businessObject = toRaw(element.value[3]);
     let extensionElements = businessObject.get('extensionElements');
     let BaseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
 
