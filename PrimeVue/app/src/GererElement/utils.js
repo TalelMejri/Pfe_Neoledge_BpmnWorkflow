@@ -50,6 +50,8 @@ export function GetElement(element, TypeChild, separator) {
                     return test['requete']
                 } else if (separator == 'TypeSgbd') {
                     return test['TypeSgbd']
+                }else if(separator == 'time'){
+                    return test['time']
                 }
             }
         }

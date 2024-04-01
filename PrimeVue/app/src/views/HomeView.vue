@@ -17,7 +17,7 @@
           @click="visibleErrors = !visibleErrors" />
       </div>
       <Sidebar class="panel" v-model:visible="visibleRight" header="Neoledge Panel" position="right">
-        <MainPanelComponent @updateActivityName="updateActivityName" :element="element" @updateProperty="updateProperty"
+        <MainPanelComponent @RefreshDiagram="RefreshDiagram" @updateActivityName="updateActivityName" :element="element" @updateProperty="updateProperty"
           :bpmnElementfactory="bpmnElementfactory" @DeleteProperties="DeleteProperties"></MainPanelComponent>
       </Sidebar>
     </div>
@@ -138,6 +138,21 @@ const handleSelectionChange = (event) => {
     visibleRight.value = false;
   }
 };
+
+const RefreshDiagram = () => {
+  modeler.saveXML({ format: true }, function (err, updatedXml) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    modeler.importXML(updatedXml, function (err) {
+      if (err) {
+        console.error(err);
+      }
+    });
+  });
+}
+
 
 const CheckStatus = (element) => {
   if (element[3]["status"] == undefined) {

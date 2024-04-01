@@ -18,7 +18,7 @@
                         <InputText class="input" id="Id" v-model="id" />
                     </Panel>
                     <Accordion class="accordion" :activeIndex="0">
-                        <AccordionTab header="Extension Properties">
+                        <AccordionTab class="accordion_tab" header="Extension Properties">
                             <div class="card_extension mb-2" v-for="(prop, index) in properties" :key="index">
                                 <p>Name : {{ prop.name }}</p>
                                 <p>Value : {{ prop.value }}</p>
@@ -36,6 +36,12 @@
                                 <Button v-else class="btn" @click="AddProperties()">Add</Button>
                             </div>
                         </AccordionTab>
+                        <AccordionTab class="accordion_tab" header="Timer"
+                            v-if="element[3]['eventDefinitions'] != undefined && element[3]['eventDefinitions'][0]['$type'].split(':')[1] == 'TimerEventDefinition'">
+                            <TimerComponent @RefreshDiagram="RefreshDiagram" :element="element"
+                                :bpmnElementfactory="bpmnElementfactory">
+                            </TimerComponent>
+                        </AccordionTab>
                     </Accordion>
                 </TabPanel>
             </div>
@@ -49,10 +55,10 @@
 </template>
 
 <script>
-import { computed, ref, toRaw, defineComponent, onMounted } from 'vue'
+import { ref, defineComponent, onMounted } from 'vue'
 import CommentComponent from './OptionsProperties/CommentComponent.vue';
-import { createElement, AddElementComposer, DeleteElement, UpdateElement, GetContentElements, GetElement } from "../../GererElement/utils.js";
-
+import { AddElementComposer, GetContentElements } from "../../GererElement/utils.js";
+import TimerComponent from './OptionsProperties/TimerComponent.vue';
 export default defineComponent({
     props: {
         element: {
@@ -65,9 +71,10 @@ export default defineComponent({
         }
     },
     components: {
-        CommentComponent
+        CommentComponent,
+        TimerComponent
     },
-    emits: ["updateActivityName", "DeleteProperties", "UpdateProperty"],
+    emits: ["updateActivityName", "DeleteProperties", "UpdateProperty", "RefreshDiagram"],
     setup(props, { emit }) {
 
         const name = ref(props.element[3]["name"]);
@@ -79,6 +86,10 @@ export default defineComponent({
         const showEdit = ref(false)
         const element = props.element;
         const properties = ref([])
+
+        const RefreshDiagram = () => {
+            emit("RefreshDiagram")
+        }
 
         onMounted(() => {
             getAllProperties()
@@ -146,7 +157,8 @@ export default defineComponent({
             AddProperties,
             deleteProperty,
             showEditModal,
-            refresh
+            refresh,
+            RefreshDiagram
         }
     }
 })
@@ -212,5 +224,9 @@ export default defineComponent({
     margin-top: 12px;
     display: flex;
     justify-content: space-between;
+}
+
+.accordion_tab {
+    margin-top: 15px !important;
 }
 </style>

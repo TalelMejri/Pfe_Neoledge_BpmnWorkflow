@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { computed, ref, toRaw, defineComponent } from 'vue'
+import { ref, defineComponent } from 'vue'
 export default defineComponent({
     props: {
     },
@@ -75,10 +75,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.config_content{
+.config_content {
     padding: 15px;
 }
-.config_content Button{
+
+.config_content Button {
     padding: 5px;
 }
 </style>
