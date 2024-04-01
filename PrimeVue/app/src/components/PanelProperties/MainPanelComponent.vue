@@ -32,6 +32,7 @@
                                 <InputText class="input" type="text" placeholder="name" v-model="name_form" />
                                 <InputText class="input" type="text" placeholder="value" v-model="value_form" />
                                 <Button v-if="showEdit" class="btn edit" @click="updateProperty()">Edit</Button>
+                                <Button v-if="showEdit" class="btn" @click="refresh()">Cancel</Button>
                                 <Button v-else class="btn" @click="AddProperties()">Add</Button>
                             </div>
                         </AccordionTab>
@@ -40,7 +41,7 @@
             </div>
             <div>
                 <TabPanel header="Comments">
-                    <CommentComponent></CommentComponent>
+                    <CommentComponent :element="element" :bpmnElementfactory="bpmnElementfactory"></CommentComponent>
                 </TabPanel>
             </div>
         </TabView>
@@ -50,7 +51,7 @@
 <script>
 import { computed, ref, toRaw, defineComponent, onMounted } from 'vue'
 import CommentComponent from './OptionsProperties/CommentComponent.vue';
-import { createElement, AddElementComposer, DeleteElement, UpdateElement } from "../../GererElement/utils.js";
+import { createElement, AddElementComposer, DeleteElement, UpdateElement, GetContentElements, GetElement } from "../../GererElement/utils.js";
 
 export default defineComponent({
     props: {
@@ -78,27 +79,23 @@ export default defineComponent({
         const showEdit = ref(false)
         const element = props.element;
         const properties = ref([])
+
         onMounted(() => {
             getAllProperties()
         })
+
         const getAllProperties = () => {
-            if (element[3]['extensionElements'] != undefined) {
-                if (element[3]['extensionElements']['values'] != undefined) {
-                    let test = element[3]['extensionElements']['values'].find((e) => e.$type == 'neo:Properties');
-                    if (test) {
-                        let tab = test['properties'];
-                        if (tab) {
-                            tab.forEach((val) => {
-                                properties.value.push({ name: val.name, value: val.value })
-                            })
-                        }
-                    }
-                }
-            }
+            properties.value = GetContentElements(element, "neo:Properties", "properties", "name");
         }
 
         const ChangeName = () => {
             emit('updateActivityName', name.value)
+        }
+
+        const refresh = () => {
+            showEdit.value = false
+            name_form.value = ""
+            value_form.value = ""
         }
 
         const updateProperty = () => {
@@ -120,6 +117,7 @@ export default defineComponent({
                 name_form.value,
                 value_form.value
             );
+            getAllProperties();
         }
 
         const deleteProperty = (index) => {
@@ -129,6 +127,7 @@ export default defineComponent({
 
         const showEditModal = (index, name, value) => {
             showEdit.value = true
+            index.value = index
             name_form.value = name
             value_form.value = value
         }
@@ -147,12 +146,13 @@ export default defineComponent({
             AddProperties,
             deleteProperty,
             showEditModal,
+            refresh
         }
     }
 })
 </script>
 
-<style scoped>
+<style>
 .tabs {
     padding: 10px;
     margin: 10px;

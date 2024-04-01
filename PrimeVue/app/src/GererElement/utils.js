@@ -6,6 +6,56 @@ export function createElement(type, properties, bpmnFactory) {
     return element;
 }
 
+
+export function GetContentElements(element, TypeChild, TypeChildOfChild, separator) {
+    var properties = [];
+    if (element[3]['extensionElements'] != undefined) {
+        if (element[3]['extensionElements']['values'] != undefined) {
+            let test = element[3]['extensionElements']['values'].find((e) => e.$type == TypeChild);
+            if (test) {
+                let tab = test[TypeChildOfChild];
+                if (tab) {
+                    tab.forEach((val) => {
+                        if (separator == 'IdUser') {
+                            properties.push({ IdUser: val.IdUser, comment: val.comment })
+                        } else if (separator == 'name') {
+                            properties.push({ name: val.name, value: val.value })
+                        } else if (separator == "source") {
+                            properties.push({ name: val.source, value: val.target })
+                        } else {
+                            properties.push({ key: val.key, value: val.value })
+                        }
+                    })
+                }
+            }
+        }
+    }
+    return properties;
+}
+
+export function GetElement(element, TypeChild, separator) {
+    if (element[3]['extensionElements'] != undefined) {
+        if (element[3]['extensionElements']['values'] != undefined) {
+            let test = toRaw(element[3]['extensionElements']['values'].find((e) => e.$type == TypeChild));
+            if (test) {
+                if (separator == 'python') {
+                    return test['code']
+                } else if (separator == 'path') {
+                    return test['path']
+                } else if (separator == 'task') {
+                    return [test['type'], test['retries']]
+                } else if (separator == 'ConnectionString') {
+                    return test['ConnectionString']
+                } else if (separator == 'requete') {
+                    return test['requete']
+                } else if (separator == 'TypeSgbd') {
+                    return test['TypeSgbd']
+                }
+            }
+        }
+    }
+}
+
 export function AddElementComposer(
     element,
     bpmnFactory,
@@ -51,7 +101,6 @@ export function AddElementComposer(
     ChildItem.get(ValuesChild).push(ChildItemValue);
 }
 
-
 export function DeleteElement(
     element,
     TypeChild,
@@ -59,10 +108,12 @@ export function DeleteElement(
     valueChild,
     properties,
     TypeChildOfChild,
-    typeName
+    typeName,
+    val
 ) {
-    const businessObject = toRaw(element.value[3]);
-    console.log(businessObject);
+
+    const businessObject = val ? toRaw(element[3]) : toRaw(element.value[3]);
+
     let extensionElements = businessObject.get('extensionElements');
 
     var baseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
@@ -122,9 +173,8 @@ export function DeleteElement(
 }
 
 
-export function UpdateElement(element, TypeChild, ValuesChild, TypeName, name, value, newName, newValue) {
-
-    const businessObject = toRaw(element.value[3]);
+export function UpdateElement(element, TypeChild, ValuesChild, TypeName, name, value, newName, newValue, val) {
+    const businessObject = val ? toRaw(element[3]) : toRaw(element.value[3]);
     let extensionElements = businessObject.get('extensionElements');
     let BaseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
 
