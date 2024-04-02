@@ -54,6 +54,24 @@
                                 :bpmnElementfactory="bpmnElementfactory">
                             </PathFileComponent>
                         </AccordionTab>
+                        <AccordionTab class="accordion_tab" header="Type SGBD"
+                            v-if="element[2].split(':')[1] === 'BusinessRuleTask'">
+                            <TypeSgbdComponent @RefreshDiagram="RefreshDiagram" :element="element"
+                                :bpmnElementfactory="bpmnElementfactory">
+                            </TypeSgbdComponent>
+                        </AccordionTab>
+                        <AccordionTab class="accordion_tab" header="Connection String"
+                            v-if="element[2].split(':')[1] === 'BusinessRuleTask'">
+                            <ConnectionStringComponent @RefreshDiagram="RefreshDiagram" :element="element"
+                                :bpmnElementfactory="bpmnElementfactory">
+                            </ConnectionStringComponent>
+                        </AccordionTab>
+                        <AccordionTab class="accordion_tab" header="Requete SQL"
+                            v-if="element[2].split(':')[1] === 'BusinessRuleTask'">
+                            <RequeteComponent @RefreshDiagram="RefreshDiagram" :element="element"
+                                :bpmnElementfactory="bpmnElementfactory">
+                            </RequeteComponent>
+                        </AccordionTab>
                     </Accordion>
                 </TabPanel>
             </div>
@@ -73,6 +91,9 @@ import { AddElementComposer, GetContentElements } from "../../GererElement/utils
 import TimerComponent from './OptionsProperties/TimerComponent.vue';
 import PathFileComponent from './OptionsProperties/PathFileComponent.vue';
 import ScriptTaskComponent from './OptionsProperties/ScriptTaskComponent.vue';
+import TypeSgbdComponent from './OptionsProperties/TypeSgbdComponent.vue';
+import ConnectionStringComponent from './OptionsProperties/ConnectionStringComponent.vue';
+import RequeteComponent from './OptionsProperties/RequeteComponent.vue';
 export default defineComponent({
     props: {
         element: {
@@ -88,7 +109,10 @@ export default defineComponent({
         CommentComponent,
         TimerComponent,
         ScriptTaskComponent,
-        PathFileComponent
+        PathFileComponent,
+        TypeSgbdComponent,
+        ConnectionStringComponent,
+        RequeteComponent
     },
     emits: ["updateActivityName", "DeleteProperties", "UpdateProperty", "RefreshDiagram"],
     setup(props, { emit }) {
