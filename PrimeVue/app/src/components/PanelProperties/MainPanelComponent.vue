@@ -48,6 +48,12 @@
                                 :bpmnElementfactory="bpmnElementfactory">
                             </ScriptTaskComponent>
                         </AccordionTab>
+                        <AccordionTab class="accordion_tab" header="Path File"
+                            v-if="element[3]['eventDefinitions'] != undefined && element[3]['eventDefinitions'][0]['$type'].split(':')[1] == 'FileInput'">
+                            <PathFileComponent @RefreshDiagram="RefreshDiagram" :element="element"
+                                :bpmnElementfactory="bpmnElementfactory">
+                            </PathFileComponent>
+                        </AccordionTab>
                     </Accordion>
                 </TabPanel>
             </div>
@@ -65,6 +71,7 @@ import { ref, defineComponent, onMounted } from 'vue'
 import CommentComponent from './OptionsProperties/CommentComponent.vue';
 import { AddElementComposer, GetContentElements } from "../../GererElement/utils.js";
 import TimerComponent from './OptionsProperties/TimerComponent.vue';
+import PathFileComponent from './OptionsProperties/PathFileComponent.vue';
 import ScriptTaskComponent from './OptionsProperties/ScriptTaskComponent.vue';
 export default defineComponent({
     props: {
@@ -80,7 +87,8 @@ export default defineComponent({
     components: {
         CommentComponent,
         TimerComponent,
-        ScriptTaskComponent
+        ScriptTaskComponent,
+        PathFileComponent
     },
     emits: ["updateActivityName", "DeleteProperties", "UpdateProperty", "RefreshDiagram"],
     setup(props, { emit }) {
@@ -94,7 +102,7 @@ export default defineComponent({
         const showEdit = ref(false)
         const element = props.element;
         const properties = ref([])
-
+        console.log(element[3]['eventDefinitions'] != undefined && element[3]['eventDefinitions'][0]['$type'].split(':')[1] == 'FileInput');
         const RefreshDiagram = () => {
             emit("RefreshDiagram")
         }
