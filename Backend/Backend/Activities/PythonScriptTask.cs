@@ -9,8 +9,6 @@ namespace Backend.Activities
 {
     public class PythonScriptTask : Activity
     {
-  
-
         public PythonScriptTask(Variable<string> code)
         {
             Script = code.Value.ToString()!;
@@ -34,7 +32,7 @@ namespace Backend.Activities
         }
         protected override void Execute(ActivityExecutionContext context)
         {
-         
+            TestPython();
         }
     }
 }

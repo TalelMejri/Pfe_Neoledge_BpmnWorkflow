@@ -20,7 +20,7 @@ builder.Services.AddElsa(elsa =>
     {
         runtime.UseEntityFrameworkCore();
     });
-    
+
     elsa.UseIdentity(identity =>
     {
         identity.UseAdminUserProvider();

@@ -1,11 +1,9 @@
-
 import { toRaw } from "vue";
 
 export function createElement(type, properties, bpmnFactory) {
     const element = bpmnFactory.create(type, properties);
     return element;
 }
-
 
 export function GetContentElements(element, TypeChild, TypeChildOfChild, separator) {
     var properties = [];
@@ -38,7 +36,7 @@ export function GetElement(element, TypeChild, separator) {
         if (element[3]['extensionElements']['values'] != undefined) {
             let test = toRaw(element[3]['extensionElements']['values'].find((e) => e.$type == TypeChild));
             if (test) {
-                if (separator == 'python') {
+                if (separator == 'code') {
                     return test['code']
                 } else if (separator == 'path') {
                     return test['path']
@@ -50,7 +48,7 @@ export function GetElement(element, TypeChild, separator) {
                     return test['requete']
                 } else if (separator == 'TypeSgbd') {
                     return test['TypeSgbd']
-                }else if(separator == 'time'){
+                } else if (separator == 'time') {
                     return test['time']
                 }
             }
@@ -173,7 +171,6 @@ export function DeleteElement(
         }
     }
 }
-
 
 export function UpdateElement(element, TypeChild, ValuesChild, TypeName, name, value, newName, newValue, val) {
     const businessObject = val ? toRaw(element[3]) : toRaw(element.value[3]);

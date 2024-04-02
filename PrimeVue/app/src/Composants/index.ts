@@ -13,6 +13,7 @@ import Panel from 'primevue/panel';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import FloatLabel from 'primevue/floatlabel';
+import Textarea from 'primevue/textarea';
 export const components = {
   Button,
   Calendar,
@@ -28,5 +29,6 @@ export const components = {
   Accordion,
   AccordionTab,
   FloatLabel,
+  Textarea
 };
 

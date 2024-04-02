@@ -42,7 +42,7 @@ import WorkfloService from "../service/WorkfloService.js"
 import { createElement, AddElementComposer, DeleteElement, UpdateElement } from "../GererElement/utils.js";
 import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
 import ColorsBpm from "../colors/index";
-import Modeler from "bpmn-js/lib/Modeler.js";
+import Modeler from "../Modeler/CustomBpmnModeler.js";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
 import LinterModule from "../LinterElement/index.js";

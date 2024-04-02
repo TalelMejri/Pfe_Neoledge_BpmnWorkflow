@@ -42,6 +42,12 @@
                                 :bpmnElementfactory="bpmnElementfactory">
                             </TimerComponent>
                         </AccordionTab>
+                        <AccordionTab class="accordion_tab" header="Python Code"
+                            v-if="element[2].split(':')[1] === 'ScriptTask'">
+                            <ScriptTaskComponent @RefreshDiagram="RefreshDiagram" :element="element"
+                                :bpmnElementfactory="bpmnElementfactory">
+                            </ScriptTaskComponent>
+                        </AccordionTab>
                     </Accordion>
                 </TabPanel>
             </div>
@@ -59,6 +65,7 @@ import { ref, defineComponent, onMounted } from 'vue'
 import CommentComponent from './OptionsProperties/CommentComponent.vue';
 import { AddElementComposer, GetContentElements } from "../../GererElement/utils.js";
 import TimerComponent from './OptionsProperties/TimerComponent.vue';
+import ScriptTaskComponent from './OptionsProperties/ScriptTaskComponent.vue';
 export default defineComponent({
     props: {
         element: {
@@ -72,7 +79,8 @@ export default defineComponent({
     },
     components: {
         CommentComponent,
-        TimerComponent
+        TimerComponent,
+        ScriptTaskComponent
     },
     emits: ["updateActivityName", "DeleteProperties", "UpdateProperty", "RefreshDiagram"],
     setup(props, { emit }) {

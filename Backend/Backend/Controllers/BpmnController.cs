@@ -31,8 +31,6 @@ namespace Backend.Controllers
         public async Task<IActionResult> UploadBpmn([FromForm] IFormFile file, [FromForm] string data)
         {
           
-            var list = new List<String>();
-
               var elements = JsonConvert.DeserializeObject<List<ElementType>>(data);
               var replay = 0;
               var path = "";
@@ -122,7 +120,7 @@ namespace Backend.Controllers
                     case "bpmn:StartEvent":
                         list.Add(element.Id);
                         break;
-                    case "bpmn:ScriptTask":
+                    /*case "bpmn:ScriptTask":
                          var scriptValue = element.ExtensionElements.FirstOrDefault(ev => ev.Code != null);
                           if (scriptValue != null)
                           {
@@ -131,17 +129,18 @@ namespace Backend.Controllers
                               await _workflowRunner.RunAsync(new ScriptTaskWorkflow(code));
                               list.Add(element.Id);
                            }
-                        break;
-                    case "bpmn:BusinessRuleTask":
+                        break;*/
+                    case "bpmn:ScriptTask":
                         var connection = element.ExtensionElements.FirstOrDefault(ev => ev.ConnectionString != null);
                         var requete = element.ExtensionElements.FirstOrDefault(ev => ev.Requete != null);
                         var type = element.ExtensionElements.FirstOrDefault(ev => ev.TypeSgbd != null);
 
                         if (connection != null && requete!=null && type!=null)
                         {
-                            var connectionTest = connection.ConnectionString;
-                            var requeteTest = requete.Requete;
-                            var typesgbd = type.TypeSgbd;
+                            var connectionTest = "Server=localhost;Port=3306;Database=bycottdb;user=root; ";// connection.ConnectionString;
+                            var requeteTest = "select * from users"; // requete.Requete;
+                            var typesgbd = "MYSQL";// type.TypeSgbd;
+                            await Task.Delay(TimeSpan.FromSeconds(2));
                             await _workflowRunner.RunAsync(new BDConnectionWorkflow(connectionTest,requeteTest, typesgbd));
                             list.Add(element.Id);
                         }
