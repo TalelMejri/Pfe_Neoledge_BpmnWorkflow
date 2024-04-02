@@ -3,46 +3,6 @@
         <InputText v-model="conn" type="text" placeholder="Enter Connection String"></InputText>
         <Button class="btn" @click="AddConnection()">Add</Button>
     </div>
-    <!-- <div class="accordion-item" v-if="element[2].split(':')[1] === 'BusinessRuleTask'">
-        <h2 class="accordion-header" id="headingPython">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#headerPython" aria-expanded="false" aria-controls="headerPython">
-                Connection String BD
-            </button>
-        </h2>
-        <div id="headerPython" class="accordion-collapse collapse" aria-labelledby="headingPython"
-            data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <div class="content_prop">
-                    <div class="card  mb-2">
-                        <div class="card-body">
-                            <input type="text" class="form-control" placeholder="ConnectionString"
-                                v-model="ConnectionString">
-                        </div>
-                        <div class="d-flex gap-2 justify-content-center mb-2">
-                            <button class="btn btn-primary" @click="AddConnectionString()">Add</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="accordion-item" v-if="element[2].split(':')[1] === 'BusinessRuleTask'">
-        <h2 class="accordion-header" id="headingPath">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#taskPath" aria-expanded="false" aria-controls="taskPath">
-                Requete SQl
-            </button>
-        </h2>
-        <div id="taskPath" class="accordion-collapse collapse " aria-labelledby="headingPath"
-            data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <input class="form-control" v-model="requet_sql" type="text" placeholder="select * from table" />
-                <button @click="AddRequete()">Add </button>
-            </div>
-        </div>
-    </div> -->
 </template>
 
 <script>
