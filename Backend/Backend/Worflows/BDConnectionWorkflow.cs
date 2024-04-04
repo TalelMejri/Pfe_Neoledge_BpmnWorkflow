@@ -40,7 +40,6 @@ namespace Backend.Worflows
                 Variables = { res,workflowCompleted},
                 Activities =
               {
-                  
                 new ExecuterRequetek(req, conn, type)
                 {
                     Result = new(res),

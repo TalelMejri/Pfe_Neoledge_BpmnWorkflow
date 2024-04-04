@@ -146,8 +146,10 @@ namespace Backend.Controllers
                             {
                                 var workflowRunner = _serviceProvider.GetRequiredService<IWorkflowRunner>();
                                 var result = await workflowRunner.RunAsync(new BDConnectionWorkflow(connectionTest, requeteTest, typesgbd));
-                                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                                string outputPath = Path.Combine(desktopPath, "res.txt");
+                              /*
+                                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                                 string outputPath = Path.Combine(desktopPath, "res.txt");
+                              */
                                 var resVar = result.WorkflowState.Output["resultat"];
                                 if (resVar != null)
                                 {
