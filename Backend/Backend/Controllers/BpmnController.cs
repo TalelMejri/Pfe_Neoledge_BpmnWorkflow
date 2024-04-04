@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Elsa.Workflows.Contracts;
 using Timer = Elsa.Scheduling.Activities.Timer;
-using Esprima.Ast;
-using Python.Runtime;
-using IronPython.Runtime;
+using Elsa.Models;
+using Elsa.Expressions.Helpers;
 
 namespace Backend.Controllers
 {
@@ -21,10 +20,11 @@ namespace Backend.Controllers
         private DateTime _lastExecutionTime = DateTime.MinValue;
         private System.Timers.Timer _timer;
         private readonly IWorkflowRunner _workflowRunner;
-
-        public BpmnController(IWorkflowRunner workflowRunner)
+        private readonly IServiceProvider _serviceProvider;
+        public BpmnController(IWorkflowRunner workflowRunner, IServiceProvider serviceProvider)
         {
             _workflowRunner = workflowRunner;
+            _serviceProvider = serviceProvider;
         }
 
         [HttpPost]
@@ -112,6 +112,7 @@ namespace Backend.Controllers
         { 
             var elements = JsonConvert.DeserializeObject<List<ElementType>>(data);
             var list = new List<String>();
+            List<string> newVal= new List<string>();
 
             foreach (var element in elements)
             {
@@ -120,29 +121,73 @@ namespace Backend.Controllers
                     case "bpmn:StartEvent":
                         list.Add(element.Id);
                         break;
-                    /*case "bpmn:ScriptTask":
+                    case "bpmn:ScriptTask":
                          var scriptValue = element.ExtensionElements.FirstOrDefault(ev => ev.Code != null);
                           if (scriptValue != null)
                           {
                               var code = scriptValue.Code;
                               //await Task.Delay(TimeSpan.FromSeconds(2));
-                              await _workflowRunner.RunAsync(new ScriptTaskWorkflow(code));
+                              await _workflowRunner.RunAsync(new ScriptTaskWorkflow(code, newVal));
                               list.Add(element.Id);
                            }
-                        break;*/
-                    case "bpmn:ScriptTask":
+                        break;
+                    case "bpmn:BusinessRuleTask":
                         var connection = element.ExtensionElements.FirstOrDefault(ev => ev.ConnectionString != null);
                         var requete = element.ExtensionElements.FirstOrDefault(ev => ev.Requete != null);
                         var type = element.ExtensionElements.FirstOrDefault(ev => ev.TypeSgbd != null);
 
                         if (connection != null && requete!=null && type!=null)
                         {
-                            var connectionTest = "Server=localhost;Port=3306;Database=bycottdb;user=root; ";// connection.ConnectionString;
-                            var requeteTest = "select * from users"; // requete.Requete;
-                            var typesgbd = "MYSQL";// type.TypeSgbd;
-                            await Task.Delay(TimeSpan.FromSeconds(2));
-                            await _workflowRunner.RunAsync(new BDConnectionWorkflow(connectionTest,requeteTest, typesgbd));
-                            list.Add(element.Id);
+                            var connectionTest = connection.ConnectionString;
+                            var requeteTest =requete.Requete;
+                            var typesgbd =  type.TypeSgbd;
+                            // await Task.Delay(TimeSpan.FromSeconds(2));
+                            try
+                            {
+                                var workflowRunner = _serviceProvider.GetRequiredService<IWorkflowRunner>();
+                                var result = await workflowRunner.RunAsync(new BDConnectionWorkflow(connectionTest, requeteTest, typesgbd));
+                                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                                string outputPath = Path.Combine(desktopPath, "res.txt");
+                                var resVar = result.WorkflowState.Output["resultat"];
+                                if (resVar != null)
+                                {
+                                    newVal.Clear();
+                                    if (resVar is List<string> resultList)
+                                    {
+                                        foreach (var item in resultList)
+                                        {
+                                            newVal.Add(item);
+                                           /* using (StreamWriter writer = new StreamWriter(outputPath, append: true))
+                                            {
+                                                string rowData = $"{item}";
+                                                writer.WriteLine(rowData);
+                                            }*/
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newVal.Clear();
+                                        using (StreamWriter writer = new StreamWriter(outputPath, append: true))
+                                        {
+                                            string rowData = "Result variable is not of type List<string>";
+                                            writer.WriteLine(rowData);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    newVal.Clear();
+                                    using (StreamWriter writer = new StreamWriter(outputPath, append: true))
+                                    {
+                                        string rowData = "Result variable is null or not found";
+                                        writer.WriteLine(rowData);
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"An error occurred: {ex.Message}");
+                            }
                         }
                         break;
                     case "bpmn:SendTask":

@@ -9,7 +9,7 @@ using Backend.Activities;
 using Elsa.Workflows.Memory;
 
 namespace Backend.Worflows
-{
+{/*
     public class GetUser : WorkflowBase
     {
         protected override void Build(IWorkflowBuilder builder)
@@ -76,6 +76,6 @@ namespace Backend.Worflows
               }
             };
         }
-    }
+    }*/
 }
 

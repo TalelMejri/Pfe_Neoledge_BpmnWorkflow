@@ -15,8 +15,9 @@ namespace Backend.Service
             _output= output;
         }
 
-        public string ExecuterRequetMysql()
+        public List<string> ExecuterRequetMysql()
         {
+            List<string> list = new List<string>();
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(ConnectionString))
@@ -37,30 +38,30 @@ namespace Backend.Service
                                         {
                                             string rowData = $"{reader["id"]}, {reader["name"]}, {reader["photo"]}, {reader["status"]}";
                                             writer.WriteLine(rowData);
+                                            list.Add(rowData);
                                         }
-                                        return "success";
                                     }
                              
                                 else
                                 {
-                                    return "No rows found";
-                               
+                                    list.Add("norow");
                                 }
                             }
                         }
                     }
                     catch (Exception ex)
-                    {
-                        return " Error ";
+                    { 
+                        list.Add("Error");
                     }
                 }
 
             }
             catch (Exception ex)
             {
-                return " Error ";
+                list.Add("Error");
 
             }
+            return list;
         }
 
         public string ExecuterRequetSqlServer()

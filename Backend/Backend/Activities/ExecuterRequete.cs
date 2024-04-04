@@ -8,10 +8,13 @@ using static Community.CsharpSqlite.Sqlite3;
 using MySqlConnector;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Backend.Service;
+using Elsa.Expressions.Models;
+using Elsa.Extensions;
+using static IronPython.Modules.PythonCsvModule;
 
 namespace Backend.Activities
 {
-    public class ExecuterRequetek : Activity
+    public class ExecuterRequetek : CodeActivity<List<string>>
     {
    
         public string ConnectionString { get; set; }
@@ -23,27 +26,29 @@ namespace Backend.Activities
             ConnectionString = connection.Value.ToString()!;
             Requete = req.Value.ToString()!;
             Type = type.Value.ToString()!;
-            TestRequet();
         }
 
-        public void TestRequet()
+        public List<string> TestRequet()
         {
+            List<string> list = new List<string>();
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string outputPath = Path.Combine(desktopPath, "output.txt");
             RequeteService requete=new RequeteService(ConnectionString,Requete,outputPath);
             if (Type == "MYSQL")
             {
-                 requete.ExecuterRequetMysql();
+                list=requete.ExecuterRequetMysql();
             }
             else if(Type == "SQL SERVER")
             {
-                requete.ExecuterRequetSqlServer();
+               // list=requete.ExecuterRequetSqlServer();
             }
+            return list;
 
         }
         protected override void Execute(ActivityExecutionContext context)
         {
-            TestRequet();
+            List<string> res= new List<string>(TestRequet());
+            Result.Set(context, res);
         }
     }
 }

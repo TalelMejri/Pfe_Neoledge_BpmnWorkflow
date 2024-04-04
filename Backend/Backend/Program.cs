@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
-// Add Elsa services.
 
 builder.Services.AddElsa(elsa =>
 {
@@ -28,24 +27,12 @@ builder.Services.AddElsa(elsa =>
     });
     elsa.UseJavaScript();
     elsa.UseLiquid();
-    elsa.UseWorkflows(workflows =>
+    /*elsa.UseWorkflows(workflows =>
     {
-        // Configure workflow execution pipeline to handle workflow contexts.
         workflows.WithWorkflowExecutionPipeline(pipeline => pipeline
             .Reset()
-            .UsePersistentVariables()
-            .UseBookmarkPersistence()
-            .UseWorkflowExecutionLogPersistence()
-            .UseWorkflowExecutionLogPersistence()
-            .UseActivityExecutionLogPersistence()
         );
-
-        // Configure activity execution pipeline to handle workflow contexts.
-        workflows.WithActivityExecutionPipeline(pipeline => pipeline
-            .Reset()
-            .UseBackgroundActivityInvoker()
-        );
-    });
+    });*/
     elsa.UseQuartz();
     elsa.UseScheduling(scheduling => scheduling.UseQuartzScheduler());
     elsa.UseWorkflowsApi(api => api.AddFastEndpointsAssembly<Program>());
@@ -54,7 +41,6 @@ builder.Services.AddElsa(elsa =>
     elsa.UseDefaultAuthentication(auth => auth.UseAdminApiKey());
     elsa.UseRealTimeWorkflows();
 });
-
 
 
 builder.Services.AddCors(options =>

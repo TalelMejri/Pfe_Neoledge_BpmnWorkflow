@@ -228,9 +228,6 @@ export default defineComponent({
     margin-bottom: 5px;
 }
 
-.accordion {
-    padding: 15px;
-}
 
 .form_properties {
     margin-top: 15px;
@@ -266,7 +263,9 @@ export default defineComponent({
     justify-content: space-between;
 }
 
+
 .accordion_tab {
     margin-top: 15px !important;
+    margin-bottom: 25px !important
 }
 </style>
