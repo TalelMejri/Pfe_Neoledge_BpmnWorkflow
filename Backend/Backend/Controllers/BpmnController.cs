@@ -157,31 +157,16 @@ namespace Backend.Controllers
                                         foreach (var item in resultList)
                                         {
                                             newVal.Add(item);
-                                           /* using (StreamWriter writer = new StreamWriter(outputPath, append: true))
-                                            {
-                                                string rowData = $"{item}";
-                                                writer.WriteLine(rowData);
-                                            }*/
                                         }
                                     }
                                     else
                                     {
                                         newVal.Clear();
-                                        using (StreamWriter writer = new StreamWriter(outputPath, append: true))
-                                        {
-                                            string rowData = "Result variable is not of type List<string>";
-                                            writer.WriteLine(rowData);
-                                        }
                                     }
                                 }
                                 else
                                 {
                                     newVal.Clear();
-                                    using (StreamWriter writer = new StreamWriter(outputPath, append: true))
-                                    {
-                                        string rowData = "Result variable is null or not found";
-                                        writer.WriteLine(rowData);
-                                    }
                                 }
                             }
                             catch (Exception ex)

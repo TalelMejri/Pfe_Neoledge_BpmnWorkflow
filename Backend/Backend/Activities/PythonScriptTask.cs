@@ -28,14 +28,10 @@ namespace Backend.Activities
            using (Py.GIL())
            {
                 PythonEngine.RunSimpleString("dataApi = ''");
-
-                // Concatenate all items into dataApi
                 foreach (var item in data_val)
                 {
                     PythonEngine.RunSimpleString($"dataApi += '{item}\\n'");
                 }
-
-                // Execute the Python script after concatenating all data
                 PythonEngine.RunSimpleString(code_val);
             }
            PythonEngine.Shutdown();
