@@ -27,12 +27,6 @@ builder.Services.AddElsa(elsa =>
     });
     elsa.UseJavaScript();
     elsa.UseLiquid();
-    /*elsa.UseWorkflows(workflows =>
-    {
-        workflows.WithWorkflowExecutionPipeline(pipeline => pipeline
-            .Reset()
-        );
-    });*/
     elsa.UseQuartz();
     elsa.UseScheduling(scheduling => scheduling.UseQuartzScheduler());
     elsa.UseWorkflowsApi(api => api.AddFastEndpointsAssembly<Program>());

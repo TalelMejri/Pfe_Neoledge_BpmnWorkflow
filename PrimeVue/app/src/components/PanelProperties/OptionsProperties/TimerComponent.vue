@@ -40,6 +40,10 @@ export default defineComponent({
                 extensionElements = createElement('bpmn:ExtensionElements', {}, bpmnElementfactory);
                 businessObject.set('extensionElements', extensionElements);
             }
+            let path_file = extensionElements.get('values').find(e => e.$type === 'neo:PathFile');
+            if (path_file) {
+                extensionElements.get('values').splice(extensionElements.get('values').indexOf(path_file), 1);
+            }
             let timerCycle = extensionElements.get('values').find(e => e.$type === 'neo:TimerCycle');
             if (!timerCycle) {
                 timerCycle = createElement('neo:TimerCycle', { time: time.value }, bpmnElementfactory);

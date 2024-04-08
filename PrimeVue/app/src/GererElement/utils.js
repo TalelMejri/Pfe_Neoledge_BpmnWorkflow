@@ -5,6 +5,29 @@ export function createElement(type, properties, bpmnFactory) {
     return element;
 }
 
+export function checkElementStart(element) {
+    const businessObject = toRaw(element[3]);
+    if (businessObject.$instanceOf('bpmn:StartEvent')) {
+        if (businessObject.eventDefinitions) {
+            if (businessObject.eventDefinitions[0]?.$type == "bpmn:TimerEventDefinition") {
+                if (businessObject.extensionElements) {
+                    let path_file = businessObject.extensionElements.get('values').find(e => e.$type === 'neo:PathFile');
+                    if (path_file) {
+                        businessObject.extensionElements.get('values').splice(businessObject.extensionElements.get('values').indexOf(path_file), 1);
+                    }
+                }
+            } else if (businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput") {
+                if (businessObject.extensionElements) {
+                    let timerCycle = businessObject.extensionElements.get('values').find(e => e.$type === 'neo:TimerCycle');
+                    if (timerCycle) {
+                        businessObject.extensionElements.get('values').splice(businessObject.extensionElements.get('values').indexOf(timerCycle), 1);
+                    }
+                }
+            }
+        }
+    }
+}
+
 export function GetContentElements(element, TypeChild, TypeChildOfChild, separator) {
     var properties = [];
     if (element[3]['extensionElements'] != undefined) {

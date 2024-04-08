@@ -15,9 +15,9 @@ namespace Backend.Controllers
     [ApiController]
     public class BpmnController : ControllerBase
     {
-        private System.Threading.Timer timer;
+      //  private System.Threading.Timer timer;
         FileService _fileService = new FileService();
-        private DateTime _lastExecutionTime = DateTime.MinValue;
+        //private DateTime _lastExecutionTime = DateTime.MinValue;
         private System.Timers.Timer _timer;
         private readonly IWorkflowRunner _workflowRunner;
         private readonly IServiceProvider _serviceProvider;
@@ -118,9 +118,9 @@ namespace Backend.Controllers
             {
                 switch (element.Type)
                 {
-                    case "bpmn:StartEvent":
+                    /*case "bpmn:StartEvent":
                         list.Add(element.Id);
-                        break;
+                        break;*/
                     case "bpmn:ScriptTask":
                          var scriptValue = element.ExtensionElements.FirstOrDefault(ev => ev.Code != null);
                           if (scriptValue != null)
@@ -128,6 +128,7 @@ namespace Backend.Controllers
                               var code = scriptValue.Code;
                               //await Task.Delay(TimeSpan.FromSeconds(2));
                               await _workflowRunner.RunAsync(new ScriptTaskWorkflow(code, newVal));
+                              newVal.Clear();
                               list.Add(element.Id);
                            }
                         break;
@@ -144,12 +145,8 @@ namespace Backend.Controllers
                             // await Task.Delay(TimeSpan.FromSeconds(2));
                             try
                             {
-                                var workflowRunner = _serviceProvider.GetRequiredService<IWorkflowRunner>();
-                                var result = await workflowRunner.RunAsync(new BDConnectionWorkflow(connectionTest, requeteTest, typesgbd));
-                              /*
-                                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                                 string outputPath = Path.Combine(desktopPath, "res.txt");
-                              */
+                                //var workflowRunner = _serviceProvider.GetRequiredService<IWorkflowRunner>();
+                                var result = await _workflowRunner.RunAsync(new BDConnectionWorkflow(connectionTest, requeteTest, typesgbd));
                                 var resVar = result.WorkflowState.Output["resultat"];
                                 if (resVar != null)
                                 {
@@ -170,6 +167,7 @@ namespace Backend.Controllers
                                 {
                                     newVal.Clear();
                                 }
+                                list.Add(element.Id);
                             }
                             catch (Exception ex)
                             {

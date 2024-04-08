@@ -8,21 +8,21 @@ const colorImageSvg = `
 </svg>
 `;
 const CorrectIcon = `
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-check-circle">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-check-circle">
   <circle cx="12" cy="12" r="10"></circle>
   <path d="M9 12l2 2 4-4"></path>
 </svg>
 
 `;
-import { addError, removeError,getErrorById } from "./util"
+import { addError, removeError, getErrorById } from "./util"
 import { ELEMENT_CHANGED_EVENT, PLAY_SIMULATION_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
 
-export default function Linter(eventBus, overlays,popupMenu,contextPad,canvas) {
-  
+export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas) {
+
   function createIcon(element) {
     var $overlay = $(colorImageSvg);
     $overlay.click(function (e) {
-       alert(getErrorById(element.id).error);
+      alert(getErrorById(element.id).error);
     });
     overlays.add(element, 'icons', {
       position: {
@@ -55,10 +55,10 @@ export default function Linter(eventBus, overlays,popupMenu,contextPad,canvas) {
       return;
     }
     if (element.businessObject.
-      $attrs.status==0) {
-        createIcon(element);
-    }else{
-        createIconCorrect(element);
+      $attrs.status == 0) {
+      createIcon(element);
+    } else {
+      createIconCorrect(element);
     }
   });
 
@@ -72,15 +72,15 @@ export default function Linter(eventBus, overlays,popupMenu,contextPad,canvas) {
       if (element.businessObject.$instanceOf('bpmn:StartEvent')) {
         if (element.businessObject.eventDefinitions) {
           if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:TimerEventDefinition") {
-            if (element.businessObject.extensionElements) {
+            if (element.businessObject.extensionElements && element.businessObject.extensionElements.get('values').find(e => e.$type === 'neo:TimerCycle')) {
               removeError(element.id);
               return;
             } else {
               addError("Start event must have a timer definition", element.id);
               createIcon(element);
             }
-          }else if(element.businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput"){
-            if (element.businessObject.extensionElements) {
+          } else if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput") {
+            if (element.businessObject.extensionElements && element.businessObject.extensionElements.get('values').find(e => e.$type === 'neo:PathFile')) {
               removeError(element.id);
               return;
             } else {

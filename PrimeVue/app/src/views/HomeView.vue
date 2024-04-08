@@ -39,7 +39,7 @@ import MainPanelComponent from "../components/PanelProperties/MainPanelComponent
 import TokenSimulationModule from 'bpmn-js-token-simulation/lib/modeler.js';
 import { toggleMode } from "../SimulationNeo/util.js"
 import WorkfloService from "../service/WorkfloService.js"
-import { createElement, AddElementComposer, DeleteElement, UpdateElement } from "../GererElement/utils.js";
+import { createElement, AddElementComposer, DeleteElement, UpdateElement ,checkElementStart} from "../GererElement/utils.js";
 import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
 import ColorsBpm from "../colors/index";
 import Modeler from "../Modeler/CustomBpmnModeler.js";
@@ -130,6 +130,7 @@ const updateProperty = (newName, NewValue, name, value) => {
 const handleSelectionChange = (event) => {
   const selectedElement = event.newSelection[0];
   if (selectedElement !== undefined) {
+    checkElementStart( [selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject]);
     element.value = [selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject];
     CheckStatus(element.value);
     visibleRight.value = true;
@@ -166,6 +167,7 @@ const CheckStatus = (element) => {
 const handleElementChange = (event) => {
   const changedElement = event.element;
   if (changedElement !== undefined) {
+    checkElementStart( [changedElement.id, changedElement.labels, changedElement.type, changedElement.businessObject]);
     element.value = [changedElement.id, changedElement.labels, changedElement.type, changedElement.businessObject];
   } else {
     element.value = null;

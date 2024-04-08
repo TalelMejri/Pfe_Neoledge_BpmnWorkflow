@@ -126,7 +126,7 @@ export default defineComponent({
         const showEdit = ref(false)
         const element = props.element;
         const properties = ref([])
-        console.log(element[3]['eventDefinitions'] != undefined && element[3]['eventDefinitions'][0]['$type'].split(':')[1] == 'FileInput');
+
         const RefreshDiagram = () => {
             emit("RefreshDiagram")
         }
