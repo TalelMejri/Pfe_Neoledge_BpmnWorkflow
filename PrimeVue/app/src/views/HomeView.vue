@@ -4,23 +4,37 @@
       <HeaderComponent></HeaderComponent>
       <HeaderComponentConfig @importDiagram="importDiagram" @resetDiagram="resetDiagram"
         @downloadDiagramXml="downloadDiagramXml" @SaveDiagram="SaveDiagram" @downloadDiagramSvg="downloadDiagramSvg"
-        @ToggleSimulation="ToggleSimulation"></HeaderComponentConfig>
+        @ToggleSimulation="ToggleSimulation" :errors="errors"></HeaderComponentConfig>
       <input type="file" accept=".bpmn" @change="handleFileImport" ref="fileInput" style="display: none" />
     </div>
     <div class="flow-container">
       <div ref="content" class="containers">
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
-      <div class="card_error" :class="visibleErrors ? 'visible' : ''">
-        Problems ({{ errors.length }})  <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
+      <div class="card_error" :class="!visibleErrors ? 'visible' : ''">
+      <div class="header_error">
+        Problems ({{ errors.length }}) <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
           @click="visibleErrors = !visibleErrors" />
+      </div>
         <div class="error_body">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corporis nostrum, iste labore vero officiis aliquam deserunt excepturi eius nisi quaerat.
+          <div>
+            <ul>
+              <li v-for="err in errors" :key="err.id">
+                <span :class="['icon', { 'info': err.code === 0, 'warning': err.code === 1, 'error': err.code === 2 }]">
+                  <i v-if="err.code === 0" class="pi pi-info-circle"></i>
+                  <i v-else-if="err.code === 1" class="pi pi-exclamation-triangle"></i>
+                  <i v-else class="pi pi-times-circle"></i>
+                </span>
+                <span>{{ err.id }}: {{ err.message }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <Sidebar class="panel" v-model:visible="visibleRight" header="Neoledge Panel" position="right">
-        <MainPanelComponent @RefreshDiagram="RefreshDiagram" @updateActivityName="updateActivityName" :element="element" @updateProperty="updateProperty"
-          :bpmnElementfactory="bpmnElementfactory" @DeleteProperties="DeleteProperties"></MainPanelComponent>
+        <MainPanelComponent @RefreshDiagram="RefreshDiagram" @updateActivityName="updateActivityName" :element="element"
+          @updateProperty="updateProperty" :bpmnElementfactory="bpmnElementfactory"
+          @DeleteProperties="DeleteProperties"></MainPanelComponent>
       </Sidebar>
     </div>
   </div>
@@ -41,15 +55,15 @@ import MainPanelComponent from "../components/PanelProperties/MainPanelComponent
 import TokenSimulationModule from 'bpmn-js-token-simulation/lib/modeler.js';
 import { toggleMode } from "../SimulationNeo/util.js"
 import WorkfloService from "../service/WorkfloService.js"
-import { createElement, AddElementComposer, DeleteElement, UpdateElement ,checkElementStart} from "../GererElement/utils.js";
+import { createElement, AddElementComposer, DeleteElement, UpdateElement, checkElementStart } from "../GererElement/utils.js";
 import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
 import ColorsBpm from "../colors/index";
 import Modeler from "../Modeler/CustomBpmnModeler.js";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
 import LinterModule from "../LinterElement/index.js";
-import { errors } from "../LinterElement/util.js";
-const error = ref(errors);
+import { functionGetAllErrors } from "../LinterElement/util.ts";
+const errors = ref(functionGetAllErrors());
 let modeler;
 const canvas = ref(null);
 const element = ref(null);
@@ -132,7 +146,7 @@ const updateProperty = (newName, NewValue, name, value) => {
 const handleSelectionChange = (event) => {
   const selectedElement = event.newSelection[0];
   if (selectedElement !== undefined) {
-    checkElementStart( [selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject]);
+    checkElementStart([selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject]);
     element.value = [selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject];
     CheckStatus(element.value);
     visibleRight.value = true;
@@ -169,7 +183,7 @@ const CheckStatus = (element) => {
 const handleElementChange = (event) => {
   const changedElement = event.element;
   if (changedElement !== undefined) {
-    checkElementStart( [changedElement.id, changedElement.labels, changedElement.type, changedElement.businessObject]);
+    checkElementStart([changedElement.id, changedElement.labels, changedElement.type, changedElement.businessObject]);
     element.value = [changedElement.id, changedElement.labels, changedElement.type, changedElement.businessObject];
   } else {
     element.value = null;
@@ -271,12 +285,16 @@ const ToggleSimulation = () => {
   display: none !important;
 }
 
-.error_body{
+.error_body {
+  font-family: Arial, sans-serif;
   overflow-y: scroll;
   height: 90px;
   position: relative;
+  padding:12px 0px 12px 0px;
 }
-
+.header_error{
+  text-align: center;
+}
 .card_error {
   position: absolute;
   left: 0;
@@ -284,19 +302,45 @@ const ToggleSimulation = () => {
   width: 100%;
   height: 120px;
   padding: 5px;
-  text-align: center;
   border: 1px solid #f0f0f0;
   background-color: white;
   transition: bottom 0.5s;
 }
 
-.card_error.visible{
+.card_error.visible {
   bottom: 0;
   height: 50px;
-   .error_body{
-      overflow-y: hidden;
-      height: 0px;
+
+  .error_body {
+    overflow-y: hidden;
+    height: 0px;
+    padding:0px;
   }
+}
+
+.error_body ul {
+  list-style: none;
+  padding: 0;
+}
+
+.error_body li {
+  margin-bottom: 10px;
+}
+
+.error_body .icon {
+  margin-right: 10px;
+}
+
+.error_body .info {
+  color: #007bff;
+}
+
+.error_body .warning {
+  color: #ffc107;
+}
+
+.error_body .error {
+  color: #dc3545;
 }
 
 .bts-toggle {
@@ -334,6 +378,4 @@ img {
 .panel {
   padding: 1em;
 }
-
-
 </style>

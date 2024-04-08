@@ -14,6 +14,7 @@ const CorrectIcon = `
 </svg>
 
 `;
+import { ErrorModel } from "../Models/Error.js";
 import { addError, removeError, getErrorById } from "./util"
 import { ELEMENT_CHANGED_EVENT, PLAY_SIMULATION_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
 
@@ -22,7 +23,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
   function createIcon(element) {
     var $overlay = $(colorImageSvg);
     $overlay.click(function (e) {
-      alert(getErrorById(element.id).error);
+      alert(getErrorById(element.id).message);
     });
     overlays.add(element, 'icons', {
       position: {
@@ -76,7 +77,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
               removeError(element.id);
               return;
             } else {
-              addError("Start event must have a timer definition", element.id);
+              addError(new ErrorModel("Start event must have a timer", 2, element.id));
               createIcon(element);
             }
           } else if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput") {
@@ -84,7 +85,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
               removeError(element.id);
               return;
             } else {
-              addError("Start event must have a file path", element.id);
+              addError(new ErrorModel("Start event must have a file input", 2, element.id));
               createIcon(element);
             }
           }
@@ -98,7 +99,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
             return;
           }
         } else {
-          addError("Task must have a Code Python", element.id);
+          addError(new ErrorModel("Script task must have a script", 2, element.id));
           createIcon(element);
         }
       }

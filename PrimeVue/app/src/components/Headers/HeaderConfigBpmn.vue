@@ -3,7 +3,7 @@
         <div class="card">
             <Toolbar class="config_content">
                 <template #start>
-                    <Button label="Execution" icon="pi pi-play" iconPos="right" raised @click="ToggleSimulation()" />
+                    <Button :disabled="errors.length > 0" label="Execution" icon="pi pi-play" iconPos="right" raised @click="ToggleSimulation()" />
                 </template>
                 <template #center>
                 </template>
@@ -20,12 +20,17 @@
 import { ref, defineComponent } from 'vue'
 export default defineComponent({
     props: {
+        errors: {
+            type: Array,
+            default: []
+        }
     },
     emits: ['importDiagram', 'resetDiagram', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation'],
     setup(props, { emit }) {
         const ToggleSimulation = () => {
             emit("ToggleSimulation")
         }
+      
         const items = ref([
             {
                 label: 'Download',
