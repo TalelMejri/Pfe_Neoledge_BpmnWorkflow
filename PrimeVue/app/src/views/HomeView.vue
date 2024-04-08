@@ -11,10 +11,12 @@
       <div ref="content" class="containers">
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
-      <div class="card_error">
-        Problems ({{ errors.length }})
-        <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
+      <div class="card_error" :class="visibleErrors ? 'visible' : ''">
+        Problems ({{ errors.length }})  <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
           @click="visibleErrors = !visibleErrors" />
+        <div class="error_body">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corporis nostrum, iste labore vero officiis aliquam deserunt excepturi eius nisi quaerat.
+        </div>
       </div>
       <Sidebar class="panel" v-model:visible="visibleRight" header="Neoledge Panel" position="right">
         <MainPanelComponent @RefreshDiagram="RefreshDiagram" @updateActivityName="updateActivityName" :element="element" @updateProperty="updateProperty"
@@ -258,7 +260,7 @@ const ToggleSimulation = () => {
 
 
 </script>
-<style>
+<style lang="scss">
 @import '~bpmn-js/dist/assets/diagram-js.css';
 @import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
 @import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
@@ -267,6 +269,34 @@ const ToggleSimulation = () => {
 
 .bts-toggle-mode {
   display: none !important;
+}
+
+.error_body{
+  overflow-y: scroll;
+  height: 90px;
+  position: relative;
+}
+
+.card_error {
+  position: absolute;
+  left: 0;
+  bottom: 2%;
+  width: 100%;
+  height: 120px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #f0f0f0;
+  background-color: white;
+  transition: bottom 0.5s;
+}
+
+.card_error.visible{
+  bottom: 0;
+  height: 50px;
+   .error_body{
+      overflow-y: hidden;
+      height: 0px;
+  }
 }
 
 .bts-toggle {
@@ -305,13 +335,5 @@ img {
   padding: 1em;
 }
 
-.card_error {
-  position: absolute;
-  bottom: 0;
-  padding: 5px;
-  width: 100%;
-  text-align: center;
-  border: 1px solid #f0f0f0;
-  /* text-align: start; */
-}
+
 </style>
