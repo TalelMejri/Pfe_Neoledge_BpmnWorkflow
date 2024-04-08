@@ -12,10 +12,10 @@
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
       <div class="card_error" :class="!visibleErrors ? 'visible' : ''">
-      <div class="header_error">
-        Problems ({{ errors.length }}) <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
-          @click="visibleErrors = !visibleErrors" />
-      </div>
+        <div class="header_error">
+          Problems ({{ errors.length }}) <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
+            @click="visibleErrors = !visibleErrors" />
+        </div>
         <div class="error_body">
           <div>
             <ul>
@@ -238,12 +238,10 @@ const downloadDiagramSvg = async () => {
   SaveSvg(modeler);
 };
 const ToggleSimulation = () => {
-  if (errors.length > 0) {
-    console.log(errors);
+  if (errors.value.length > 0) {
     alert("There are errors in the process. Please fix them before starting the simulation.")
     return;
   } else {
-
     modeler.saveXML({ format: true }, function (err, updatedXml) {
       if (err) {
         console.error(err);
@@ -290,11 +288,13 @@ const ToggleSimulation = () => {
   overflow-y: scroll;
   height: 90px;
   position: relative;
-  padding:12px 0px 12px 0px;
+  padding: 12px 0px 12px 0px;
 }
-.header_error{
+
+.header_error {
   text-align: center;
 }
+
 .card_error {
   position: absolute;
   left: 0;
@@ -314,7 +314,7 @@ const ToggleSimulation = () => {
   .error_body {
     overflow-y: hidden;
     height: 0px;
-    padding:0px;
+    padding: 0px;
   }
 }
 
