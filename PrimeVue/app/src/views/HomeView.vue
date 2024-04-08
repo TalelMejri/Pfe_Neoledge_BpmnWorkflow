@@ -12,12 +12,21 @@
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
       <div class="card_error" :class="!visibleErrors ? 'visible' : ''">
-        <div class="header_error">
-          Problems ({{ errors.length }}) <Button icon="pi pi-exclamation-triangle" class="mx-2" severity="secondary"
-            @click="visibleErrors = !visibleErrors" />
+        <div class="header_error" @click="visibleErrors = !visibleErrors">
+          <p>
+            Problems <Badge :value="errors.length" severity="danger"></Badge>
+          </p>
         </div>
         <div class="error_body">
           <div>
+            <ul v-if="errors.length == 0">
+              <li class="errors_empty">
+                <span class="icon check">
+                  <i class="pi pi-check"></i>
+                </span>
+                <span>No errors found</span>
+              </li>
+            </ul>
             <ul>
               <li v-for="err in errors" :key="err.id">
                 <span :class="['icon', { 'info': err.code === 0, 'warning': err.code === 1, 'error': err.code === 2 }]">
@@ -289,15 +298,35 @@ const ToggleSimulation = () => {
   height: 90px;
   position: relative;
   padding: 12px 0px 12px 0px;
+  .errors_empty {
+    text-align: center;
+    padding-top: 18px;
+    span {
+      font-size: 15px !important;
+    }
+  }
 }
 
 .header_error {
   text-align: center;
+
+  p {
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: center;
+    font-weight: bold;
+    padding-bottom: 1px;
+  }
+
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .card_error {
   position: absolute;
   left: 0;
+  cursor: pointer;
   bottom: 2%;
   width: 100%;
   height: 120px;
@@ -309,10 +338,10 @@ const ToggleSimulation = () => {
 
 .card_error.visible {
   bottom: 0;
-  height: 50px;
+  height: 33px;
 
   .error_body {
-    overflow-y: hidden;
+    overflow: hidden;
     height: 0px;
     padding: 0px;
   }
@@ -337,6 +366,10 @@ const ToggleSimulation = () => {
 
 .error_body .warning {
   color: #ffc107;
+}
+
+.error_body .check {
+  color: green;
 }
 
 .error_body .error {
@@ -377,5 +410,9 @@ img {
 
 .panel {
   padding: 1em;
+}
+
+.p-button {
+  background-color: #0a6e89 !important
 }
 </style>

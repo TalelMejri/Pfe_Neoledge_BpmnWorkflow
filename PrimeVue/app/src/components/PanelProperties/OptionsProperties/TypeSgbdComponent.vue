@@ -1,7 +1,5 @@
 <template>
-    <select v-model="type_sgbd" @change="AddTypeSgbd">
-        <option v-for="item in Items" :key="item" :value="item">{{ item }}</option>
-    </select>
+    <Dropdown v-model="type_sgbd" :options="Items"  placeholder="Select  Type SGBD" class="w-full md:w-14rem" />
 </template>
 
 <script>

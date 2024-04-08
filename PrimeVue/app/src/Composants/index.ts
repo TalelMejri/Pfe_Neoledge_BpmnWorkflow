@@ -14,6 +14,9 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import FloatLabel from 'primevue/floatlabel';
 import Textarea from 'primevue/textarea';
+import Dropdown from 'primevue/dropdown';
+import Badge from 'primevue/badge';
+
 export const components = {
   Button,
   Calendar,
@@ -29,6 +32,8 @@ export const components = {
   Accordion,
   AccordionTab,
   FloatLabel,
-  Textarea
+  Textarea,
+  Dropdown,
+  Badge,
 };
 

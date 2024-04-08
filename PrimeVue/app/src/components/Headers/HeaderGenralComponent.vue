@@ -8,10 +8,10 @@
                 <template #center>
                     <p class="titre">Neoledge Processus</p>
                 </template>
-                <template #end class="d-flex gap-4">
+                <!-- <template #end class="d-flex gap-4">
                     <Button icon="pi pi-bell" class="mx-2" severity="secondary" />
                     <Button icon="pi pi-user" class="mx-2 " severity="secondary" />
-                </template>
+                </template> -->
             </Toolbar>
         </div>
     </div>
@@ -21,13 +21,15 @@
 
 </script>
 
-<style scoped >
+<style scoped>
 .titre {
     font-size: 18px;
     font-weight: bold;
+    color: #1b1f2d !important;
 }
+
 .content {
-    background: linear-gradient(120deg, white 50%, yellow 50%) !important;
+    background: linear-gradient(120deg, white 50%, #0a6e89 50%) !important;
     padding: .5em !important;
 }
 </style>

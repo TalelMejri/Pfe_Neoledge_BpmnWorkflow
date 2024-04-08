@@ -8,8 +8,10 @@
                 <template #center>
                 </template>
                 <template #end>
-                    <SpeedDial :model="items" :transitionDelay="80" direction="left" style="right: 1em;"
-                        buttonClass="p-button-warning" />
+                    <div class="list_config">
+                        <Button v-for="item in items" :icon="item.icon"
+                            v-tooltip.top="{ value: item.tooltip, showDelay: 100, hideDelay: 100 }" />
+                    </div>
                 </template>
             </Toolbar>
         </div>
@@ -30,6 +32,7 @@ export default defineComponent({
             {
                 label: 'Download',
                 icon: 'pi pi-download',
+                tooltip: "Download as XML",
                 command: () => {
                     emit("downloadDiagramXml");
                 }
@@ -37,12 +40,14 @@ export default defineComponent({
             {
                 label: 'Save',
                 icon: 'pi pi-image',
+                tooltip: "Save as SVG",
                 command: () => {
                     emit("downloadDiagramSvg")
                 }
             },
             {
                 label: 'Refresh',
+                tooltip: "Reset Diagram",
                 icon: 'pi pi-refresh',
                 command: () => {
                     emit("resetDiagram")
@@ -51,6 +56,7 @@ export default defineComponent({
 
             {
                 label: 'Upload',
+                tooltip: "Import Diagram",
                 icon: 'pi pi-upload',
                 command: () => {
                     emit("importDiagram");
@@ -58,6 +64,7 @@ export default defineComponent({
             },
             {
                 label: 'Save',
+                tooltip: "Save Diagram",
                 icon: 'pi pi-save',
                 command: () => {
                     emit("SaveDiagram")
@@ -81,5 +88,20 @@ export default defineComponent({
 
 .config_content Button {
     padding: 5px;
+}
+
+.list_config {
+    margin-right: 25px;
+    display: flex;
+    gap: 12px;
+}
+
+.p-toolbar-group-center {
+    padding: 50px !important;
+}
+
+.p-tooltip-text {
+    padding: 50px !important;
+
 }
 </style>

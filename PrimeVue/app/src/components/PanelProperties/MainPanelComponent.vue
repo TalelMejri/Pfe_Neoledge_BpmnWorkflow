@@ -18,7 +18,7 @@
                         <InputText class="input" id="Id" v-model="id" />
                     </Panel>
                     <Accordion class="accordion" :activeIndex="0">
-                        <AccordionTab class="accordion_tab" header="Extension Properties">
+                        <AccordionTab class="accordion_tab m-4" header="Extension Properties">
                             <div class="card_extension mb-2" v-for="(prop, index) in properties" :key="index">
                                 <p>Name : {{ prop.name }}</p>
                                 <p>Value : {{ prop.value }}</p>
@@ -209,7 +209,10 @@ export default defineComponent({
     padding: 10px;
     margin: 10px;
 }
-
+.p-accordion-tab{
+    margin: 9px !important;
+    margin-bottom: 25px !important;
+}
 .NameContent {
     display: flex;
     margin-top: 15px;
@@ -263,9 +266,8 @@ export default defineComponent({
     justify-content: space-between;
 }
 
-
-.accordion_tab {
-    margin-top: 15px !important;
-    margin-bottom: 25px !important
+.p-tabview-title{
+    margin-right: 15px !important;
 }
+
 </style>

@@ -5,7 +5,6 @@ const colorImageSvg =
     </svg>
   `;
 
-
 export default function ColorContextPadProvider(contextPad, popupMenu, canvas, translate) {
 
   this._contextPad = contextPad;
@@ -57,7 +56,6 @@ ColorContextPadProvider.prototype._createPopupAction = function(elements) {
               y: event.y
             }
           };
-        
           popupMenu.open(elements, 'color-picker', position);
           try{
             const container = document.querySelector('.djs-popup-body');

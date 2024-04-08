@@ -75,17 +75,13 @@ const COLORS = [
         id:color.label.toLowerCase() + '-color',
         action: createAction(self._modeling, elements, color)
       };
-      
     });
-  
     return entries;
-
   };
   
   
   function createAction(modeling, element, color) {
     return function() {
-    
       modeling.setColor(element, color);
     };
   }

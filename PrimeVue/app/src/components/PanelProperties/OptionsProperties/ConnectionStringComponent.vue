@@ -59,3 +59,9 @@ export default defineComponent({
     }
 })
 </script>
+
+<style>
+.form_properties{
+    margin: 15px;
+}
+</style>

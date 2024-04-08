@@ -1,11 +1,12 @@
 import $ from 'jquery';
 
 const colorImageSvg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-alert-circle">
-    <circle cx="12" cy="12" r="10"></circle>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon">
+    <polygon points="6 2 18 2 22 6 22 18 18 22 6 22 2 18 2 6 6 2"></polygon>
     <line x1="12" y1="8" x2="12" y2="12"></line>
     <line x1="12" y1="16" x2="12" y2="16"></line>
 </svg>
+
 `;
 const CorrectIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-check-circle">
@@ -46,6 +47,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
       },
       html: $overlay
     });
+
   }
 
   eventBus.on(ELEMENT_CHANGED_EVENT, function (event) {
