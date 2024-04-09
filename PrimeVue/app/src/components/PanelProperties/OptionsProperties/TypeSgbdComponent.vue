@@ -1,5 +1,7 @@
 <template>
-    <Dropdown v-model="type_sgbd" :options="Items"  placeholder="Select  Type SGBD" class="w-full md:w-14rem" />
+    <div class="dropdown_content">
+        <Dropdown v-model="type_sgbd" :options="Items"  placeholder="Select  Type SGBD"  />
+    </div>
 </template>
 
 <script>
@@ -58,3 +60,9 @@ export default defineComponent({
     }
 })
 </script>
+
+<style>
+.dropdown_content{
+    padding: 15px;
+}
+</style>

@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div v-else>
-                <div class="no-comments py-5 mt-5">
+                <div class="no-comments">
                     NO Comments Yet
                 </div>
             </div>
@@ -133,6 +133,11 @@ export default defineComponent({
 
 .no-comments {
     color: #666;
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .input-container {
@@ -141,7 +146,8 @@ export default defineComponent({
     border-radius: 25px;
     box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
     display: flex;
-    padding: 11px 5px;
+    padding: 11px 15px;
+    margin-left: -12px !important;
     gap: 4px;
 }
 </style>

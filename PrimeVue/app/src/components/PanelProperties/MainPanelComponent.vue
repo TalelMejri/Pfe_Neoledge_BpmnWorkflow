@@ -255,9 +255,10 @@ export default defineComponent({
 }
 
 .card_extension {
-    padding: 10px;
     border: 1px solid #f0f0f0;
-    margin-top: 10px;
+    margin-top: 12px;
+    padding: 15px;
+    text-align: center;
 }
 
 .card_extension div {

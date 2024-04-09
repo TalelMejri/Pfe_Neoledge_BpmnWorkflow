@@ -10,7 +10,8 @@
                 <template #end>
                     <div class="list_config">
                         <Button v-for="item in items" :icon="item.icon"
-                            v-tooltip.top="{ value: item.tooltip, showDelay: 100, hideDelay: 100 }" />
+                            v-tooltip.top="{ value: item.tooltip, showDelay: 100, hideDelay: 100 }"
+                            @click="item.command" />
                     </div>
                 </template>
             </Toolbar>
