@@ -298,13 +298,32 @@ const ToggleSimulation = () => {
   height: 90px;
   position: relative;
   padding: 12px 0px 12px 0px;
+
   .errors_empty {
     text-align: center;
     padding-top: 18px;
+
     span {
       font-size: 15px !important;
     }
   }
+}
+
+.error_body::-webkit-scrollbar {
+  width: 12px;
+}
+
+.error_body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.error_body::-webkit-scrollbar-thumb {
+  background: #0a6e89;
+  border-radius: 6px;
+}
+
+.error_body::-webkit-scrollbar-thumb:hover {
+  background: #0a6e89;
 }
 
 .header_error {
