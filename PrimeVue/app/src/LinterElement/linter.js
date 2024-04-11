@@ -40,7 +40,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
     $overlay.click(function (e) {
       console.log("error");
     });
- 
+
     overlays.add(element, 'icons', {
       position: {
         bottom: 10,
@@ -64,11 +64,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
       createIconCorrect(element);
     }
   });
-
   eventBus.on(['shape.changed', 'shape.added'], function (event) {
-    if (event.type === 'shape.create') {
-      console.log("shape.shape");
-    }
     var element = event.element;
     if (element.labelTarget ||
       !element.businessObject.$instanceOf('bpmn:FlowNode')) {
@@ -76,10 +72,15 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
     }
     defer(function () {
       if (element.businessObject.$instanceOf('bpmn:StartEvent')) {
+        if (element.businessObject.name == null || element.businessObject.name == "") {
+          addError(new ErrorModel("Start event must have a name", 0, element.id));
+        } else {
+          removeError(element.id,"Start event must have a name");
+        }
         if (element.businessObject.eventDefinitions) {
           if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:TimerEventDefinition") {
             if (element.businessObject.extensionElements && element.businessObject.extensionElements.get('values').find(e => e.$type === 'neo:TimerCycle')) {
-              removeError(element.id);
+              removeError(element.id,"Start event must have a timer");
               return;
             } else {
               addError(new ErrorModel("Start event must have a timer", 2, element.id));
@@ -87,7 +88,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
             }
           } else if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput") {
             if (element.businessObject.extensionElements && element.businessObject.extensionElements.get('values').find(e => e.$type === 'neo:PathFile')) {
-              removeError(element.id);
+              removeError(element.id,"Start event must have a file input");
               return;
             } else {
               addError(new ErrorModel("Start event must have a file input", 2, element.id));
@@ -98,9 +99,15 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
           return
         }
       } else if (element.businessObject.$instanceOf('bpmn:ScriptTask')) {
+        if (element.businessObject.name == null || element.businessObject.name == "") {
+          console.log("error");
+          addError(new ErrorModel("Script task must have a name", 0, element.id));
+        } else {
+          removeError(element.id,"Script task must have a name");
+        }
         if (element.businessObject.extensionElements) {
           if (element.businessObject.extensionElements.values[0]['code'] != "") {
-            removeError(element.id);
+            removeError(element.id,"Script task must have a script");
             return;
           }
         } else {

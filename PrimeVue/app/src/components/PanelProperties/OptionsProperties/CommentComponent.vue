@@ -19,12 +19,12 @@
             </div>
             <div v-else>
                 <div class="no-comments">
-                    NO Comments Yet
+                    No comments yet.
                 </div>
             </div>
             <div class="input-container">
                 <InputText class="input" type="text" v-model="commentInput" placeholder="Enter your comment..." />
-                <Button @click="addComments()">Add</Button>
+                <Button @click="addComments()">Send</Button>
             </div>
         </div>
     </div>

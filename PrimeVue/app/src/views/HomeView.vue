@@ -14,27 +14,27 @@
       <div class="card_error" :class="!visibleErrors ? 'visible' : ''">
         <div class="header_error" @click="visibleErrors = !visibleErrors">
           <p>
-            Problems <Badge :value="errors.length" severity="danger"></Badge>
+            Problems <Badge :value="problems.length" severity="danger"></Badge>
           </p>
         </div>
         <div class="error_body">
           <div>
-            <ul v-if="errors.length == 0">
+            <ul v-if="problems.length == 0">
               <li class="errors_empty">
                 <span class="icon check">
-                  <i class="pi pi-check"></i>
+                  <i class="pi pi-check-circle"></i>
                 </span>
-                <span>No errors found</span>
+                <span>No problems found. You can start executing your diagram now</span>
               </li>
             </ul>
             <ul>
-              <li v-for="err in errors" :key="err.id">
+              <li v-for="err in problems" :key="err.id">
                 <span :class="['icon', { 'info': err.code === 0, 'warning': err.code === 1, 'error': err.code === 2 }]">
                   <i v-if="err.code === 0" class="pi pi-info-circle"></i>
                   <i v-else-if="err.code === 1" class="pi pi-exclamation-triangle"></i>
                   <i v-else class="pi pi-times-circle"></i>
                 </span>
-                <span>{{ err.id }}: {{ err.message }}</span>
+                <span>{{ err.idElement }}: {{ err.message }}</span>
               </li>
             </ul>
           </div>
@@ -71,8 +71,12 @@ import Modeler from "../Modeler/CustomBpmnModeler.js";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
 import LinterModule from "../LinterElement/index.js";
-import { functionGetAllErrors } from "../LinterElement/util.ts";
-const errors = ref(functionGetAllErrors());
+import {
+  GetAllErrors,
+  GetAllProblems
+} from "../LinterElement/util.ts";
+const errors = ref(GetAllErrors());
+const problems = ref(GetAllProblems());
 let modeler;
 const canvas = ref(null);
 const element = ref(null);
@@ -260,23 +264,24 @@ const ToggleSimulation = () => {
       }
       const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
       var definitions = modeler.get("canvas").getRootElement().businessObject.$parent;
-      WorkfloService.UploadFile(blob, parseBPMNJson(definitions)).then((res) => {
-        if (res.data.length == 0) {
-          return;
-        } else {
-          for (let i = 0; i < (res.data).length; i++) {
-            const elementNew = bpmnElementRegistry.get(res.data[i]);
-            modeler.get('modeling').updateProperties(elementNew, { status: 1 });
-          }
-          const eventBus = modeler.get('eventBus');
-          const active = _active.value;
-          _active.value = !active;
-          const canvas = modeler.get('canvas');
-          const selection = modeler.get('selection');
-          const contextPad = modeler.get('contextPad');
-          toggleMode(active, eventBus, canvas, selection, contextPad);
-        }
-      })
+      console.log(parseBPMNJson(definitions));
+      // WorkfloService.UploadFile(blob, parseBPMNJson(definitions)).then((res) => {
+      //   if (res.data.length == 0) {
+      //     return;
+      //   } else {
+      //     for (let i = 0; i < (res.data).length; i++) {
+      //       const elementNew = bpmnElementRegistry.get(res.data[i]);
+      //       modeler.get('modeling').updateProperties(elementNew, { status: 1 });
+      //     }
+      //     const eventBus = modeler.get('eventBus');
+      //     const active = _active.value;
+      //     _active.value = !active;
+      //     const canvas = modeler.get('canvas');
+      //     const selection = modeler.get('selection');
+      //     const contextPad = modeler.get('contextPad');
+      //     toggleMode(active, eventBus, canvas, selection, contextPad);
+      //   }
+      // })
     });
   }
 }
@@ -307,6 +312,7 @@ const ToggleSimulation = () => {
 
     span {
       font-size: 15px !important;
+      font-weight: 500;
     }
   }
 }
