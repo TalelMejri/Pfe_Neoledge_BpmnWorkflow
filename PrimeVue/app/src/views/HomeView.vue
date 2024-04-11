@@ -4,10 +4,14 @@
       <HeaderComponent></HeaderComponent>
       <HeaderComponentConfig @importDiagram="importDiagram" @resetDiagram="resetDiagram"
         @downloadDiagramXml="downloadDiagramXml" @SaveDiagram="SaveDiagram" @downloadDiagramSvg="downloadDiagramSvg"
-        @ToggleSimulation="ToggleSimulation" :errors="errors"></HeaderComponentConfig>
+        @ToggleSimulation="ToggleSimulation" @BackModeling="BackModeling" @editXML="editXML" :xml_viewer="xml_viewer"
+        :errors="errors"></HeaderComponentConfig>
       <input type="file" accept=".bpmn" @change="handleFileImport" ref="fileInput" style="display: none" />
     </div>
-    <div class="flow-container">
+    <div v-if="xml_viewer">
+      <textarea v-model="xmlContent" @input="UpdateModelingXml"></textarea>
+    </div>
+    <div class="flow-container" v-else>
       <div ref="content" class="containers">
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
@@ -57,7 +61,7 @@ import {
   SaveSvg,
   ResetDiagramLocal,
   parseBPMNJson,
-} from "../Utils/diagram_util.ts"
+} from "../Utils/diagram_util.ts";
 import HeaderComponent from "../components/Headers/HeaderGenralComponent.vue"
 import HeaderComponentConfig from "../components/Headers/HeaderConfigBpmn.vue"
 import MainPanelComponent from "../components/PanelProperties/MainPanelComponent"
@@ -71,6 +75,7 @@ import Modeler from "../Modeler/CustomBpmnModeler";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
 import LinterModule from "../LinterElement/index.ts";
+import { pd } from 'pretty-data';
 import {
   GetAllErrors,
   GetAllProblems
@@ -85,8 +90,10 @@ const visibleRight = ref(false);
 const visibleErrors = ref(false);
 const fileInput = ref(null);
 let zoomLevel = ref(1);
+const xmlContent = ref("")
 let bpmnElementRegistry;
 let bpmnElementfactory;
+let xml_viewer = ref(false);
 
 onMounted(() => {
   initializeModeler();
@@ -96,6 +103,47 @@ onBeforeMount(() => {
   initializeModeler();
 });
 
+const editXML = () => {
+  modeler.saveXML({ format: true }, function (err, updatedXml) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    xmlContent.value = pd.xml(updatedXml);
+  });
+  xml_viewer.value = true;
+}
+
+const BackModeling = () => {
+  xml_viewer.value = false;
+  UpdateModelingXml();
+}
+
+const UpdateModelingXml = () => {
+  if (modeler) {
+    modeler.destroy();
+  }
+  modeler.importXML(xmlContent.value, function (err) {
+    modeler = new Modeler({
+      container: canvas.value,
+      keyboard: { bindTo: window },
+      additionalModules: [
+        gridModule,
+        ColorsBpm,
+        LinterModule,
+        TokenSimulationModule
+      ],
+      moddleExtensions: { neo: NeoledgeDescriptor }
+    });
+
+    bpmnElementRegistry = modeler.get('elementRegistry');
+    bpmnElementfactory = modeler.get('bpmnFactory');
+
+    bindModelerEvents();
+    openLocalDiagram(modeler, xmlContent.value);
+  });
+
+}
 
 const initializeModeler = () => {
   modeler = new Modeler({
@@ -443,5 +491,31 @@ img {
 
 .p-button {
   background-color: #0a6e89 !important
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  overflow-y: scroll;
+  max-height: 550px;
+  height: 550px;
+  padding: 5px;
+}
+
+textarea::-webkit-scrollbar {
+  width: 12px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #0a6e89;
+  border-radius: 6px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #0a6e89;
 }
 </style>

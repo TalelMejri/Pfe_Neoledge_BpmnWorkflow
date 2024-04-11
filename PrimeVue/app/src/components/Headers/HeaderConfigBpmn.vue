@@ -3,15 +3,18 @@
         <div class="card">
             <Toolbar class="config_content">
                 <template #start>
-                    <Button label="Execution" icon="pi pi-play" iconPos="right" raised @click="ToggleSimulation()" />
+                    <Button v-if="!xml_viewer" label="Execution" icon="pi pi-play" iconPos="right" raised @click="ToggleSimulation()" />
                 </template>
                 <template #center>
                 </template>
                 <template #end>
-                    <div class="list_config">
+                    <div class="list_config" v-if="!xml_viewer">
                         <Button v-for="item in items" :icon="item.icon"
                             v-tooltip.top="{ value: item.tooltip, showDelay: 100, hideDelay: 100 }"
                             @click="item.command" />
+                    </div>
+                    <div v-else @click="BackModeling()">
+                        <Button>Back to modeling view</Button>
                     </div>
                 </template>
             </Toolbar>
@@ -23,11 +26,15 @@
 import { ref, defineComponent } from 'vue'
 export default defineComponent({
     props: {
+        xml_viewer: Boolean
     },
-    emits: ['importDiagram', 'resetDiagram', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation'],
+    emits: ['importDiagram', 'BackModeling', 'resetDiagram', 'editXML', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation'],
     setup(props, { emit }) {
         const ToggleSimulation = () => {
             emit("ToggleSimulation")
+        }
+        const BackModeling = () => {
+            emit("BackModeling")
         }
         const items = ref([
             {
@@ -55,6 +62,7 @@ export default defineComponent({
                 }
             },
 
+
             {
                 label: 'Upload',
                 tooltip: "Import Diagram",
@@ -70,12 +78,21 @@ export default defineComponent({
                 command: () => {
                     emit("SaveDiagram")
                 }
-            }
+            },
+            {
+                label: 'Edit',
+                tooltip: "Edit XML",
+                icon: 'pi pi-code',
+                command: () => {
+                    emit("editXML")
+                }
+            },
         ])
 
         return {
             items,
             ToggleSimulation,
+            BackModeling
         }
     }
 
