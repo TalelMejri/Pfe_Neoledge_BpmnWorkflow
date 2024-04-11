@@ -99,7 +99,7 @@ export function ResetDiagramLocal() {
   localStorage.removeItem("savedDiagram");
 }
 
-export function parseBPMNJson(rootElements:any) {
+export function parseBPMNJson({rootElements}:any) {
   if (!Array.isArray(rootElements) || rootElements.length === 0) {
     console.log("No root elements found.");
     return;

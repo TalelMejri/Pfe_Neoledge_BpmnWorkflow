@@ -1,5 +1,4 @@
-// @ts-ignore
-import { ErrorModel } from "../Models/Error.js";
+import { ErrorModel } from "../Models/Error";
 
 const errors: ErrorModel[] = [];
 
@@ -11,7 +10,7 @@ export function addError(error: ErrorModel) {
 }
 
 export function getErrorById(element_id: number): ErrorModel | undefined {
-    return errors.find(e => e.idElement === element_id) 
+    return errors.find(e => e.idElement === element_id)
 }
 
 export function removeError(element_id: number, message: string) {

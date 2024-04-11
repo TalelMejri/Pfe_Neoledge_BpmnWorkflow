@@ -3,9 +3,9 @@ import $ from 'jquery';
 // @ts-ignore
 import { BpmnEvent } from '../bpmn-js/lib/core';
 // @ts-ignore
-import { ELEMENT_CHANGED_EVENT, PLAY_SIMULATION_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
-import { ErrorModel } from "../Models/Error";
-import { addError, removeError, getErrorById, removeAllErrors } from "./util"
+import { ELEMENT_CHANGED_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
+import { getErrorById, GetAllErrors } from "./GererError"
+import { ErrorBpmn } from "./BpmnRules";
 const colorImageSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon">
     <polygon points="6 2 18 2 22 6 22 18 18 22 6 22 2 18 2 6 6 2"></polygon>
@@ -44,7 +44,6 @@ export default function Linter(eventBus: any, overlays: any, popupMenu: any, con
     $overlay.click(function (e: any) {
       console.log("error");
     });
-
     overlays.add(element, 'icons', {
       position: {
         bottom: 10,
@@ -52,7 +51,6 @@ export default function Linter(eventBus: any, overlays: any, popupMenu: any, con
       },
       html: $overlay
     });
-
   }
 
   eventBus.on(ELEMENT_CHANGED_EVENT, function (event: BpmnEvent) {
@@ -75,49 +73,10 @@ export default function Linter(eventBus: any, overlays: any, popupMenu: any, con
       return;
     }
     defer(function () {
-      if (element.businessObject.$instanceOf('bpmn:StartEvent')) {
-        if (element.businessObject.name == null || element.businessObject.name == "") {
-          addError(new ErrorModel("Start event must have a name", 0, element.id));
-        } else {
-          removeError(element.id, "Start event must have a name");
-        }
-        if (element.businessObject.eventDefinitions) {
-          if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:TimerEventDefinition") {
-            if (element.businessObject.extensionElements && element.businessObject.extensionElements.get('values').find((e: any) => e.$type === 'neo:TimerCycle')) {
-              removeError(element.id, "Start event must have a timer");
-              return;
-            } else {
-              addError(new ErrorModel("Start event must have a timer", 2, element.id));
-              createIcon(element);
-            }
-          } else if (element.businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput") {
-            if (element.businessObject.extensionElements && element.businessObject.extensionElements.get('values').find((e: any) => e.$type === 'neo:PathFile')) {
-              removeError(element.id, "Start event must have a file input");
-              return;
-            } else {
-              addError(new ErrorModel("Start event must have a file input", 2, element.id));
-              createIcon(element);
-            }
-          }
-        } else {
-          return
-        }
-      } else if (element.businessObject.$instanceOf('bpmn:ScriptTask')) {
-        if (element.businessObject.name == null || element.businessObject.name == "") {
-          console.log("error");
-          addError(new ErrorModel("Script task must have a name", 0, element.id));
-        } else {
-          removeError(element.id, "Script task must have a name");
-        }
-        if (element.businessObject.extensionElements) {
-          if (element.businessObject.extensionElements.values[0]['code'] != "") {
-            removeError(element.id, "Script task must have a script");
-            return;
-          }
-        } else {
-          addError(new ErrorModel("Script task must have a script", 2, element.id));
-          createIcon(element);
-        }
+      ErrorBpmn(element);
+      const errors = GetAllErrors();
+      if (errors.findIndex(e => e.idElement === element.id) != -1) {
+        createIcon(element);
       }
     });
   });

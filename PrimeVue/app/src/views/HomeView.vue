@@ -74,7 +74,7 @@ import LinterModule from "../LinterElement/index.ts";
 import {
   GetAllErrors,
   GetAllProblems
-} from "../LinterElement/util.ts";
+} from "../LinterElement/GererError.ts";
 const errors = ref(GetAllErrors());
 const problems = ref(GetAllProblems());
 let modeler;
@@ -267,24 +267,23 @@ const ToggleSimulation = () => {
       }
       const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
       var definitions = modeler.get("canvas").getRootElement().businessObject.$parent;
-      console.log(parseBPMNJson(definitions));
-      // WorkfloService.UploadFile(blob, parseBPMNJson(definitions)).then((res) => {
-      //   if (res.data.length == 0) {
-      //     return;
-      //   } else {
-      //     for (let i = 0; i < (res.data).length; i++) {
-      //       const elementNew = bpmnElementRegistry.get(res.data[i]);
-      //       modeler.get('modeling').updateProperties(elementNew, { status: 1 });
-      //     }
-      //     const eventBus = modeler.get('eventBus');
-      //     const active = _active.value;
-      //     _active.value = !active;
-      //     const canvas = modeler.get('canvas');
-      //     const selection = modeler.get('selection');
-      //     const contextPad = modeler.get('contextPad');
-      //     toggleMode(active, eventBus, canvas, selection, contextPad);
-      //   }
-      // })
+      WorkfloService.UploadFile(blob, parseBPMNJson(definitions)).then((res) => {
+        if (res.data.length == 0) {
+          return;
+        } else {
+          for (let i = 0; i < (res.data).length; i++) {
+            const elementNew = bpmnElementRegistry.get(res.data[i]);
+            modeler.get('modeling').updateProperties(elementNew, { status: 1 });
+          }
+          const eventBus = modeler.get('eventBus');
+          const active = _active.value;
+          _active.value = !active;
+          const canvas = modeler.get('canvas');
+          const selection = modeler.get('selection');
+          const contextPad = modeler.get('contextPad');
+          toggleMode(active, eventBus, canvas, selection, contextPad);
+        }
+      })
     });
   }
 }
