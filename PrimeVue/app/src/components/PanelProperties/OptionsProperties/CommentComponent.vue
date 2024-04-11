@@ -32,7 +32,7 @@
 
 <script>
 import { ref, defineComponent, onMounted } from 'vue'
-import { AddElementComposer, DeleteElement, GetContentElements, } from "../../../GererElement/utils.js";
+import { AddElementComposer, DeleteElement, GetContentElements, } from "../../../GererElement/utils.ts";
 
 export default defineComponent({
     props: {

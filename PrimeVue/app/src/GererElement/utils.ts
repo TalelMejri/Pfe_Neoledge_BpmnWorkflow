@@ -1,24 +1,24 @@
 import { toRaw } from "vue";
 
-export function createElement(type, properties, bpmnFactory) {
+export function createElement(type:string, properties:any, bpmnFactory:any) {
     const element = bpmnFactory.create(type, properties);
     return element;
 }
 
-export function checkElementStart(element) {
+export function checkElementStart(element:any) {
     const businessObject = toRaw(element[3]);
     if (businessObject.$instanceOf('bpmn:StartEvent')) {
         if (businessObject.eventDefinitions) {
             if (businessObject.eventDefinitions[0]?.$type == "bpmn:TimerEventDefinition") {
                 if (businessObject.extensionElements) {
-                    let path_file = businessObject.extensionElements.get('values').find(e => e.$type === 'neo:PathFile');
+                    let path_file = businessObject.extensionElements.get('values').find((e:any) => e.$type === 'neo:PathFile');
                     if (path_file) {
                         businessObject.extensionElements.get('values').splice(businessObject.extensionElements.get('values').indexOf(path_file), 1);
                     }
                 }
             } else if (businessObject.eventDefinitions[0]?.$type == "bpmn:FileInput") {
                 if (businessObject.extensionElements) {
-                    let timerCycle = businessObject.extensionElements.get('values').find(e => e.$type === 'neo:TimerCycle');
+                    let timerCycle = businessObject.extensionElements.get('values').find((e:any) => e.$type === 'neo:TimerCycle');
                     if (timerCycle) {
                         businessObject.extensionElements.get('values').splice(businessObject.extensionElements.get('values').indexOf(timerCycle), 1);
                     }
@@ -28,15 +28,15 @@ export function checkElementStart(element) {
     }
 }
 
-export function GetContentElements(element, TypeChild, TypeChildOfChild, separator) {
-    var properties = [];
+export function GetContentElements(element:any, TypeChild:any, TypeChildOfChild:any, separator:any) {
+    var properties:any = [];
     if (element[3]['extensionElements'] != undefined) {
         if (element[3]['extensionElements']['values'] != undefined) {
-            let test = element[3]['extensionElements']['values'].find((e) => e.$type == TypeChild);
+            let test = element[3]['extensionElements']['values'].find((e:any) => e.$type == TypeChild);
             if (test) {
                 let tab = test[TypeChildOfChild];
                 if (tab) {
-                    tab.forEach((val) => {
+                    tab.forEach((val:any) => {
                         if (separator == 'IdUser') {
                             properties.push({ IdUser: val.IdUser, comment: val.comment })
                         } else if (separator == 'name') {
@@ -54,10 +54,10 @@ export function GetContentElements(element, TypeChild, TypeChildOfChild, separat
     return properties;
 }
 
-export function GetElement(element, TypeChild, separator) {
+export function GetElement(element:any, TypeChild:any, separator:any) {
     if (element[3]['extensionElements'] != undefined) {
         if (element[3]['extensionElements']['values'] != undefined) {
-            let test = toRaw(element[3]['extensionElements']['values'].find((e) => e.$type == TypeChild));
+            let test = toRaw(element[3]['extensionElements']['values'].find((e:any) => e.$type == TypeChild));
             if (test) {
                 if (separator == 'code') {
                     return test['code']
@@ -80,13 +80,13 @@ export function GetElement(element, TypeChild, separator) {
 }
 
 export function AddElementComposer(
-    element,
-    bpmnFactory,
-    TypeChild,
-    TypeChildOfChild,
-    ValuesChild,
-    typeName,
-    name, value
+    element:any,
+    bpmnFactory:any,
+    TypeChild:any,
+    TypeChildOfChild:any,
+    ValuesChild:any,
+    typeName:any,
+    name:any, value:any
 ) {
     const businessObject = toRaw(element[3]);
     let ItemParent = businessObject.get("extensionElements");
@@ -96,7 +96,7 @@ export function AddElementComposer(
         businessObject.set("extensionElements", ItemParent);
     }
 
-    let ChildItem = ItemParent.get('values').find(e => e.$type === TypeChild);
+    let ChildItem = ItemParent.get('values').find((e:any) => e.$type === TypeChild);
 
     if (!ChildItem) {
         ChildItem = createElement(TypeChild, {}, bpmnFactory);
@@ -125,21 +125,21 @@ export function AddElementComposer(
 }
 
 export function DeleteElement(
-    element,
-    TypeChild,
-    bpmnFactory,
-    valueChild,
-    properties,
-    TypeChildOfChild,
-    typeName,
-    val
+    element:any,
+    TypeChild:any,
+    bpmnFactory:any,
+    valueChild:any,
+    properties:any,
+    TypeChildOfChild:any,
+    typeName:any,
+    val:any
 ) {
 
     const businessObject = val ? toRaw(element[3]) : toRaw(element.value[3]);
 
     let extensionElements = businessObject.get('extensionElements');
 
-    var baseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
+    var baseElement = extensionElements.get('values').find((e:any) => e.$type === TypeChild);
 
     if (valueChild == "properties") {
         baseElement.properties = [];
@@ -195,17 +195,17 @@ export function DeleteElement(
     }
 }
 
-export function UpdateElement(element, TypeChild, ValuesChild, TypeName, name, value, newName, newValue, val) {
+export function UpdateElement(element:any, TypeChild:any, ValuesChild:any, TypeName:any, name:any, value:any, newName:any, newValue:any, val:any) {
     const businessObject = val ? toRaw(element[3]) : toRaw(element.value[3]);
     let extensionElements = businessObject.get('extensionElements');
-    let BaseElement = extensionElements.get('values').find(e => e.$type === TypeChild);
+    let BaseElement = extensionElements.get('values').find((e:any)=> e.$type === TypeChild);
 
     if (TypeName == "name") {
-        var res = BaseElement.get(ValuesChild).find(e => e.name === name && e.value === value);
+        var res = BaseElement.get(ValuesChild).find((e:any) => e.name === name && e.value === value);
     } else if (TypeName == "value") {
-        var res = BaseElement.get(ValuesChild).find(e => e.key === name && e.value === value);
+        var res = BaseElement.get(ValuesChild).find((e:any) => e.key === name && e.value === value);
     } else {
-        var res = BaseElement.get(ValuesChild).find(e => e.source === name && e.target === value);
+        var res = BaseElement.get(ValuesChild).find((e:any) => e.source === name && e.target === value);
     }
 
     if (res) {

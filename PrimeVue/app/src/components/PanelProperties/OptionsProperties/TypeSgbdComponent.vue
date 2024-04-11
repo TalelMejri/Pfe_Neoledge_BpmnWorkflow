@@ -6,7 +6,7 @@
 
 <script>
 import { ref, defineComponent, onMounted, toRaw } from 'vue'
-import { GetElement, createElement } from "../../../GererElement/utils.js";
+import { GetElement, createElement } from "../../../GererElement/utils.ts";
 export default defineComponent({
     props: {
         element: {

@@ -57,20 +57,20 @@ import {
   SaveSvg,
   ResetDiagramLocal,
   parseBPMNJson,
-} from "../Utils/diagram_util.js"
+} from "../Utils/diagram_util.ts"
 import HeaderComponent from "../components/Headers/HeaderGenralComponent.vue"
 import HeaderComponentConfig from "../components/Headers/HeaderConfigBpmn.vue"
 import MainPanelComponent from "../components/PanelProperties/MainPanelComponent"
 import TokenSimulationModule from 'bpmn-js-token-simulation/lib/modeler.js';
-import { toggleMode } from "../SimulationNeo/util.js"
-import WorkfloService from "../service/WorkfloService.js"
-import { createElement, AddElementComposer, DeleteElement, UpdateElement, checkElementStart } from "../GererElement/utils.js";
+import { toggleMode } from "../SimulationNeo/util.ts"
+import WorkfloService from "../service/WorkfloService.ts"
+import { DeleteElement, UpdateElement, checkElementStart } from "../GererElement/utils.ts";
 import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
 import ColorsBpm from "../colors/index";
-import Modeler from "../Modeler/CustomBpmnModeler.js";
+import Modeler from "../Modeler/CustomBpmnModeler";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
-import LinterModule from "../LinterElement/index.js";
+import LinterModule from "../LinterElement/index.ts";
 import {
   GetAllErrors,
   GetAllProblems
@@ -221,18 +221,21 @@ const handleFileImport = (event) => {
       keyboard: { bindTo: window },
       additionalModules: [
         gridModule,
-        LinterModule,
         ColorsBpm,
+        LinterModule,
         TokenSimulationModule
       ],
       moddleExtensions: { neo: NeoledgeDescriptor }
     });
+
 
     bpmnElementRegistry = modeler.get('elementRegistry');
     bpmnElementfactory = modeler.get('bpmnFactory');
 
     bindModelerEvents();
     openLocalDiagram(modeler, e.target.result);
+
+    ResetDiagramLocal();
   };
   reader.readAsBinaryString(file);
 };

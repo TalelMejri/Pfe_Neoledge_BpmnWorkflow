@@ -5,11 +5,10 @@ import {
     query as domQuery
 } from 'min-dom';
 
-import {
-    TOGGLE_MODE_EVENT
-} from "bpmn-js-token-simulation/lib/util/EventHelper.js"
+// @ts-ignore
+import { TOGGLE_MODE_EVENT } from "bpmn-js-token-simulation/lib/util/EventHelper.js"
 
-export function toggleMode(active, eventBus, canvas, selection, contextPad) {
+export function toggleMode(active: any, eventBus: any, canvas: any, selection: any, contextPad: any) {
     eventBus.fire(TOGGLE_MODE_EVENT, { active });
     if (active) {
         domClasses(canvas.getContainer().parentNode).add('simulation');

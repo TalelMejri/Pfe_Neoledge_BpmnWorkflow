@@ -87,7 +87,7 @@
 <script>
 import { ref, defineComponent, onMounted } from 'vue'
 import CommentComponent from './OptionsProperties/CommentComponent.vue';
-import { AddElementComposer, GetContentElements } from "../../GererElement/utils.js";
+import { AddElementComposer, GetContentElements } from "../../GererElement/utils.ts";
 import TimerComponent from './OptionsProperties/TimerComponent.vue';
 import PathFileComponent from './OptionsProperties/PathFileComponent.vue';
 import ScriptTaskComponent from './OptionsProperties/ScriptTaskComponent.vue';

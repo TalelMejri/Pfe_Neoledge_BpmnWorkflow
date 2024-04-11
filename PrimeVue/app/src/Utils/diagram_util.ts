@@ -18,8 +18,8 @@ const InitialDiagram = `
 </definitions>
 `
 
- function openDiagram(modeler, diagramXml) {
-  modeler.importXML(diagramXml, error => {
+ function openDiagram(modeler:any, diagramXml:any) {
+  modeler.importXML(diagramXml, (error:any) => {
     if (error) {
       console.error('Could not import BPMN diagram', error);
     } else {
@@ -29,20 +29,20 @@ const InitialDiagram = `
     }
   });
 }
-export function RefreshDiagram(modeler) {
-  modeler.saveXML({ format: true }, function (err, updatedXml) {
+export function RefreshDiagram(modeler:any) {
+  modeler.saveXML({ format: true }, function (err:any, updatedXml:any) {
     if (err) {
       console.error(err);
       return;
     }
-    modeler.importXML(updatedXml, function (err) {
+    modeler.importXML(updatedXml, function (err:any) {
       if (err) {
         console.error(err);
       }
     });
   });
 }
-export function openLocalDiagram(modeler, local) {
+export function openLocalDiagram(modeler:any, local:any) {
   if (local == null) {
     let localDiagram = localStorage.getItem("savedDiagram");
     let diagram = localDiagram ? localDiagram : InitialDiagram;
@@ -53,8 +53,8 @@ export function openLocalDiagram(modeler, local) {
 
 }
 
-export function saveDiagram(modeler) {
-  modeler.saveXML({ format: true }, function (err, xml) {
+export function saveDiagram(modeler:any) {
+  modeler.saveXML({ format: true }, function (err:any, xml:any) {
     if (err) {
       console.log('Error saving XML', err);
     } else {
@@ -72,8 +72,8 @@ export function saveDiagram(modeler) {
   })
 }
 
-export function SaveSvg(modeler) {
-  modeler.saveSVG({ format: true }, function (err, svg) {
+export function SaveSvg(modeler:any) {
+  modeler.saveSVG({ format: true }, function (err:any, svg:any) {
     if (err) {
       console.error('Error saving SVG: ', err);
     } else {
@@ -89,8 +89,8 @@ export function SaveSvg(modeler) {
   });
 }
 
-export function saveDiagramToLocal(modeler) {
-  modeler.saveXML({ format: true }, function (err, xml) {
+export function saveDiagramToLocal(modeler:any) {
+  modeler.saveXML({ format: true }, function (err:any, xml:any) {
     localStorage.setItem("savedDiagram", xml);
   });
 }
@@ -99,7 +99,7 @@ export function ResetDiagramLocal() {
   localStorage.removeItem("savedDiagram");
 }
 
-export function parseBPMNJson({ rootElements }) {
+export function parseBPMNJson(rootElements:any) {
   if (!Array.isArray(rootElements) || rootElements.length === 0) {
     console.log("No root elements found.");
     return;
@@ -111,9 +111,9 @@ export function parseBPMNJson({ rootElements }) {
     console.log("No flow elements found.");
     return;
   }
-  const mappedSteps = steps.map(el => {
+  const mappedSteps = steps.map((el:any) => {
     const extensionElements = el.extensionElements?.values || [];
-    const combinedExtensionElements = extensionElements.reduce((acc, curr) => {
+    const combinedExtensionElements = extensionElements.reduce((acc:any, curr:any) => {
       return { ...acc, ...curr };
     }, {});
       

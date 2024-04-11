@@ -1,3 +1,4 @@
+// @ts-ignore
 import Modeler from "../bpmn-js/lib/Modeler.js";
 
 // import { START_EVENT } from "bpmn-js/lib/features/replace/ReplaceOptions.js";

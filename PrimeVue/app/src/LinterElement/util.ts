@@ -10,11 +10,11 @@ export function addError(error: ErrorModel) {
     }
 }
 
-export function getErrorById(element_id: string): ErrorModel {
-    return errors.find(e => e.idElement === element_id);
+export function getErrorById(element_id: number): ErrorModel | undefined {
+    return errors.find(e => e.idElement === element_id) 
 }
 
-export function removeError(element_id: string, message: string) {
+export function removeError(element_id: number, message: string) {
     const index = errors.findIndex(e => e.idElement === element_id && e.message === message);
     if (index !== -1) {
         errors.splice(index, 1);

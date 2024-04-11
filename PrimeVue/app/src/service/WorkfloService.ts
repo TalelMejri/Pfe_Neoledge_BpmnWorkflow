@@ -1,6 +1,6 @@
 import Axios from "axios";
 export default {
-    UploadFile(file,data){
+    UploadFile(file:any,data:any){
         const formData = new FormData();
         formData.append('file', file);
         formData.append('data', JSON.stringify(data));
