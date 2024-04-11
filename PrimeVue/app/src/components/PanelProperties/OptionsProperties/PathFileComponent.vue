@@ -7,7 +7,7 @@
 
 <script>
 import { ref, defineComponent, onMounted, toRaw } from 'vue'
-import { GetElement, createElement } from "../../../GererElement/utils.ts";
+import { GetElement, createElement, AddElement } from "../../../GererElement/utils.ts";
 export default defineComponent({
     props: {
         element: {
@@ -34,23 +34,7 @@ export default defineComponent({
         }
 
         const AddPath = () => {
-            const businessObject = toRaw(element[3]);
-            let extensionElements = businessObject.get('extensionElements');
-            if (!extensionElements) {
-                extensionElements = createElement('bpmn:ExtensionElements', {}, bpmnElementfactory);
-                businessObject.set('extensionElements', extensionElements);
-            }
-            let timerCycle = extensionElements.get('values').find(e => e.$type === 'neo:TimerCycle');
-            if (timerCycle) {
-                extensionElements.get('values').splice(extensionElements.get('values').indexOf(timerCycle), 1);
-            }
-            let path_file = extensionElements.get('values').find(e => e.$type === 'neo:PathFile');
-            if (!path_file) {
-                path_file = createElement('neo:PathFile', { path: path.value }, bpmnElementfactory);
-                extensionElements.get('values').push(path_file);
-            } else {
-                path_file.path = path.value;
-            }
+            AddElement(element, bpmnElementfactory, 'neo:PathFile', 'path', path.value);
             emit("RefreshDiagram");
         }
 

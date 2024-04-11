@@ -7,7 +7,7 @@
 
 <script>
 import { ref, defineComponent, onMounted, toRaw } from 'vue'
-import { GetElement, createElement } from "../../../GererElement/utils.ts";
+import { GetElement, AddElement } from "../../../GererElement/utils.ts";
 export default defineComponent({
     props: {
         element: {
@@ -34,19 +34,7 @@ export default defineComponent({
         }
 
         const AddCode = () => {
-            const businessObject = toRaw(element[3]);
-            let extensionElements = businessObject.get('extensionElements');
-            if (!extensionElements) {
-                extensionElements = createElement('bpmn:ExtensionElements', {}, bpmnElementfactory);
-                businessObject.set('extensionElements', extensionElements);
-            }
-            let code_python = extensionElements.get('values').find(e => e.$type === 'neo:PythonCode');
-            if (!code_python) {
-                code_python = createElement('neo:PythonCode', { code: code.value }, bpmnElementfactory);
-                extensionElements.get('values').push(code_python);
-            } else {
-                code_python.code = code.value;
-            }
+            AddElement(element, bpmnElementfactory, 'neo:PythonCode', 'code', code.value);
             emit("RefreshDiagram");
         }
 

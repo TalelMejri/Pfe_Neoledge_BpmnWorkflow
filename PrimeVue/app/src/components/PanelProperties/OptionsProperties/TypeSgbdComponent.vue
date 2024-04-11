@@ -6,7 +6,7 @@
 
 <script>
 import { ref, defineComponent, onMounted, toRaw } from 'vue'
-import { GetElement, createElement } from "../../../GererElement/utils.ts";
+import { GetElement, AddElement } from "../../../GererElement/utils.ts";
 export default defineComponent({
     props: {
         element: {
@@ -33,19 +33,7 @@ export default defineComponent({
         }
 
         const AddTypeSgbd = () => {
-            const businessObject = toRaw(element[3]);
-            let extensionElements = businessObject.get('extensionElements');
-            if (!extensionElements) {
-                extensionElements = createElement('bpmn:ExtensionElements', {}, bpmnElementfactory);
-                businessObject.set('extensionElements', extensionElements);
-            }
-            let typeSgbd = extensionElements.get('values').find(e => e.$type === 'neo:TypeSgbd');
-            if (!typeSgbd) {
-                typeSgbd = createElement('neo:TypeSgbd', { TypeSgbd: type_sgbd.value }, bpmnElementfactory);
-                extensionElements.get('values').push(typeSgbd);
-            } else {
-                typeSgbd.TypeSgbd = type_sgbd.value;
-            }
+            AddElement(element, bpmnElementfactory, 'neo:TypeSgbd', 'TypeSgbd', type_sgbd.value);
             emit("RefreshDiagram");
         }
 

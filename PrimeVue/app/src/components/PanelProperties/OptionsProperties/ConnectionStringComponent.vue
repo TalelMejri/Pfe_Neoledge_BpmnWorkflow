@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import { ref, defineComponent, onMounted, toRaw } from 'vue'
-import { GetElement, createElement } from "../../../GererElement/utils.ts";
+import { ref, defineComponent, onMounted } from 'vue'
+import { GetElement, AddElement } from "../../../GererElement/utils.ts";
 export default defineComponent({
     props: {
         element: {
@@ -33,19 +33,7 @@ export default defineComponent({
         }
 
         const AddConnection = () => {
-            const businessObject = toRaw(element[3]);
-            let extensionElements = businessObject.get('extensionElements');
-            if (!extensionElements) {
-                extensionElements = createElement('bpmn:ExtensionElements', {}, bpmnElementfactory);
-                businessObject.set('extensionElements', extensionElements);
-            }
-            let ConnectionSgbd = extensionElements.get('values').find(e => e.$type === 'neo:ConnectionString');
-            if (!ConnectionSgbd) {
-                ConnectionSgbd = createElement('neo:ConnectionString', { ConnectionString: conn.value }, bpmnElementfactory);
-                extensionElements.get('values').push(ConnectionSgbd);
-            } else {
-                ConnectionSgbd.ConnectionString = conn.value;
-            }
+            AddElement(element, bpmnElementfactory, 'neo:ConnectionString', 'ConnectionString', conn.value);
             emit("RefreshDiagram");
         }
 

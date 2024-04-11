@@ -7,7 +7,7 @@
 
 <script>
 import { ref, defineComponent, onMounted, toRaw } from 'vue'
-import { GetElement, createElement } from "../../../GererElement/utils.ts";
+import { GetElement,AddElement } from "../../../GererElement/utils.ts";
 export default defineComponent({
     props: {
         element: {
@@ -33,19 +33,7 @@ export default defineComponent({
         }
 
         const AddRequete = () => {
-            const businessObject = toRaw(element[3]);
-            let extensionElements = businessObject.get('extensionElements');
-            if (!extensionElements) {
-                extensionElements = createElement('bpmn:ExtensionElements', {}, bpmnElementfactory);
-                businessObject.set('extensionElements', extensionElements);
-            }
-            let RequeteElement = extensionElements.get('values').find(e => e.$type === 'neo:RequeteSQL');
-            if (!RequeteElement) {
-                RequeteElement = createElement('neo:RequeteSQL', { requete: requete.value }, bpmnElementfactory);
-                extensionElements.get('values').push(RequeteElement);
-            } else {
-                RequeteElement.requete = requete.value;
-            }
+            AddElement(element, bpmnElementfactory, 'neo:RequeteSQL', 'requete', requete.value);
             emit("RefreshDiagram");
         }
 
