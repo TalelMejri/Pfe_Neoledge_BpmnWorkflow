@@ -114,7 +114,7 @@ const initializeModeler = () => {
 
 const bindModelerEvents = () => {
   modeler.on('selection.changed', handleSelectionChange);
-  modeler.on('element.changed', handleElementChange);
+  modeler.on('element.click', handleElementChange);
 };
 
 const updateActivityName = newName => {
@@ -155,6 +155,8 @@ const updateProperty = (newName, NewValue, name, value) => {
 const handleSelectionChange = (event) => {
   const selectedElement = event.newSelection[0];
   if (selectedElement !== undefined) {
+    // const eventBus = modeler.get('eventBus');
+    // eventBus.fire('tokenSimulation.simulator.elementChanged', { true: true });
     checkElementStart([selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject]);
     element.value = [selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject];
     CheckStatus(element.value);

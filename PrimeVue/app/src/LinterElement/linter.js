@@ -16,7 +16,7 @@ const CorrectIcon = `
 
 `;
 import { ErrorModel } from "../Models/Error.js";
-import { addError, removeError, getErrorById } from "./util"
+import { addError, removeError, getErrorById, removeAllErrors } from "./util"
 import { ELEMENT_CHANGED_EVENT, PLAY_SIMULATION_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
 
 export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas) {
@@ -40,6 +40,7 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
     $overlay.click(function (e) {
       console.log("error");
     });
+ 
     overlays.add(element, 'icons', {
       position: {
         bottom: 10,
@@ -51,7 +52,6 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
   }
 
   eventBus.on(ELEMENT_CHANGED_EVENT, function (event) {
-    console.log("ELEMENT_CHANGED_EVENT");
     var element = event.element;
     if (element.labelTarget ||
       !element.businessObject.$instanceOf('bpmn:FlowNode')) {
@@ -66,6 +66,9 @@ export default function Linter(eventBus, overlays, popupMenu, contextPad, canvas
   });
 
   eventBus.on(['shape.changed', 'shape.added'], function (event) {
+    if (event.type === 'shape.create') {
+      console.log("shape.shape");
+    }
     var element = event.element;
     if (element.labelTarget ||
       !element.businessObject.$instanceOf('bpmn:FlowNode')) {

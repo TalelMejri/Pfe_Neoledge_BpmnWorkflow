@@ -20,6 +20,10 @@ export function removeError(element_id: string) {
     }
 }
 
+export function removeAllErrors() {
+    errors.splice(0, errors.length);
+}
+
 export function functionGetAllErrors(): ErrorModel[] {
     return errors;
 }
