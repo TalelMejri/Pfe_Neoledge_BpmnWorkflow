@@ -8,8 +8,11 @@
         :errors="errors"></HeaderComponentConfig>
       <input type="file" accept=".bpmn" @change="handleFileImport" ref="fileInput" style="display: none" />
     </div>
-    <div v-if="xml_viewer">
-      <textarea v-model="xmlContent" @input="UpdateModelingXml"></textarea>
+    <div v-if="xml_viewer" class="xml-editor">
+      <div class="numbers">
+        <span v-html="numbers_lines()" class="numbers-line"></span>
+      </div>
+      <pre class="xml-code" contenteditable><code ref="XmlEdit" class="language-xml" v-html="xmlContent"></code></pre>
     </div>
     <div class="flow-container" v-else>
       <div ref="content" class="containers">
@@ -75,7 +78,9 @@ import Modeler from "../Modeler/CustomBpmnModeler";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
 import LinterModule from "../LinterElement/index.ts";
-import { pd } from 'pretty-data';
+import hljs from 'highlight.js/lib/core';
+import xml from 'highlight.js/lib/languages/xml';
+hljs.registerLanguage('xml', xml);
 import {
   GetAllErrors,
   GetAllProblems
@@ -94,6 +99,7 @@ const xmlContent = ref("")
 let bpmnElementRegistry;
 let bpmnElementfactory;
 let xml_viewer = ref(false);
+const XmlEdit = ref("XmlEdit");
 
 onMounted(() => {
   initializeModeler();
@@ -109,8 +115,12 @@ const editXML = () => {
       console.error(err);
       return;
     }
-    xmlContent.value = pd.xml(updatedXml);
+    xmlContent.value = hljs.highlight(
+      updatedXml,
+      { language: 'xml' }
+    ).value;
   });
+
   xml_viewer.value = true;
 }
 
@@ -119,11 +129,21 @@ const BackModeling = () => {
   UpdateModelingXml();
 }
 
+const numbers_lines = () => {
+  let lines = xmlContent.value.split("\n").length;
+  let numbers = "";
+  for (let i = 1; i <= lines; i++) {
+    numbers += i + "\n";
+  }
+  return numbers;
+}
+
 const UpdateModelingXml = () => {
+  const xmlContentNew = XmlEdit.value.textContent;
   if (modeler) {
     modeler.destroy();
   }
-  modeler.importXML(xmlContent.value, function (err) {
+  modeler.importXML(xmlContent.value.textContent, function (err) {
     modeler = new Modeler({
       container: canvas.value,
       keyboard: { bindTo: window },
@@ -140,10 +160,29 @@ const UpdateModelingXml = () => {
     bpmnElementfactory = modeler.get('bpmnFactory');
 
     bindModelerEvents();
-    openLocalDiagram(modeler, xmlContent.value);
+    fixDuplicateIds(modeler)
+    openLocalDiagram(modeler, xmlContentNew);
   });
-
 }
+
+const fixDuplicateIds = (modeler) => {
+  const elementRegistry = modeler.get('elementRegistry');
+  const elements = elementRegistry.getAll();
+  const idMap = new Map();
+  elements.forEach(element => {
+    const id = element.id;
+    const type = element.type;
+    if (idMap.has(id)) {
+      let count = idMap.get(id);
+      count++;
+      const newId = id + "_" + count;
+      idMap.set(id, count);
+      modeler.get('modeling').updateProperties(element, { id: newId });
+    } else {
+      idMap.set(id, 1);
+    }
+  });
+};
 
 const initializeModeler = () => {
   modeler = new Modeler({
@@ -189,7 +228,6 @@ const DeleteProperties = (properties) => {
     "name"
   );
 };
-
 
 const updateProperty = (newName, NewValue, name, value) => {
   UpdateElement(
@@ -349,6 +387,27 @@ const ToggleSimulation = () => {
   display: none !important;
 }
 
+.language-xml {
+  color: #c678dd;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.language-xml .hljs-meta {
+  color: #61afef;
+  font-weight: normal;
+}
+
+.language-xml .hljs-attr {
+  color: #e06c75;
+  font-weight: bold;
+}
+
+.language-xml .hljs-string {
+  color: #98c379;
+  font-weight: normal;
+}
+
 .error_body {
   font-family: Arial, sans-serif;
   overflow-y: scroll;
@@ -493,29 +552,51 @@ img {
   background-color: #0a6e89 !important
 }
 
-textarea {
+.xml-editor {
   width: 100%;
   border: 1px solid #ccc;
+  display: flex;
+  background-color: whitesmoke;
   overflow-y: scroll;
   max-height: 550px;
   height: 550px;
-  padding: 5px;
+  padding: 15px;
 }
 
-textarea::-webkit-scrollbar {
+.xml-editor::-webkit-scrollbar {
   width: 12px;
+  height: 10px;
+  cursor: pointer;
 }
 
-textarea::-webkit-scrollbar-track {
+.xml-editor::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-textarea::-webkit-scrollbar-thumb {
+.xml-editor::-webkit-scrollbar-thumb {
   background: #0a6e89;
   border-radius: 6px;
 }
 
-textarea::-webkit-scrollbar-thumb:hover {
+.xml-editor::-webkit-scrollbar-thumb:hover {
   background: #0a6e89;
+}
+
+.xml-code {
+  margin-left: 12px !important;
+
+}
+
+.numbers {
+  white-space: pre-line;
+  font-size: 14px;
+  padding-top: 1.5px;
+  color: gray;
+
+}
+
+.numbers-line {
+  display: block;
+  line-height: 16.6px;
 }
 </style>
