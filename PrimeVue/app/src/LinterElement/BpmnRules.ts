@@ -45,5 +45,7 @@ export function ErrorBpmn(element:any) {
     } else if (element.businessObject.$instanceOf('bpmn:ScriptTask')) {
         validateName(element, "ScriptTask must have a name");
         validateScriptTask(element);
+    } else if(element.businessObject.$instanceOf('bpmn:BusinessRuleTask')) {
+        validateName(element, "BusinessRuleTask event must have a name");
     }
 }
