@@ -18,6 +18,22 @@
       <div ref="content" class="containers">
         <div id="canvas" ref="canvas" class="canvas"></div>
       </div>
+      <div class="OptionConfig" :class="visibleErrors ? 'visible' : ''">
+        <Button icon="pi pi-search-plus" v-tooltip.top="{ value: 'Zoom In', showDelay: 100, hideDelay: 100 }"
+          @click="zoomIn" />
+        <Button icon="pi pi-search-minus" v-tooltip.top="{ value: 'Zoom out', showDelay: 100, hideDelay: 100 }"
+          @click="zoomOut" />
+        <Button icon="pi pi-bars" v-tooltip.top="{ value: 'Keyboard Shortcuts', showDelay: 100, hideDelay: 100 }"
+          @click="visible = true" />
+      </div>
+      <Dialog class="keyboard-shortcuts" v-model:visible="visible" modal header="keyboard-shortcuts"
+        :style="{ width: '25rem' }">
+        <ul>
+          <li v-for="shortcut in keyboardShortcuts" :key="shortcut.key">
+            <span>{{ shortcut.description }}</span> <span class="shortcut-keys">{{ shortcut.key }}</span>
+          </li>
+        </ul>
+      </Dialog>
       <div class="card_error" :class="!visibleErrors ? 'visible' : ''">
         <div class="header_error" @click="visibleErrors = !visibleErrors">
           <p>
@@ -100,6 +116,22 @@ let bpmnElementRegistry;
 let bpmnElementfactory;
 let xml_viewer = ref(false);
 const XmlEdit = ref("XmlEdit");
+const visible = ref(false);
+
+const keyboardShortcuts = [
+  { key: 'Ctrl + Z', description: 'Undo' },
+  { key: 'Ctrl + ⇧ + Z', description: 'Redo' },
+  { key: 'Ctrl + A', description: 'Select All' },
+  { key: 'H', description: 'Hand Tool' },
+  { key: 'E', description: 'Direct Editing' },
+  { key: 'L', description: 'Lasso Tool' },
+  { key: '⇧ + M', description: 'Create Milestone' },
+  { key: 'Ctrl + Scrolling', description: 'Scrolling (Vertical)' },
+  { key: 'Ctrl + ⇧ + Scrolling', description: 'Scrolling (Horizontal)' },
+  { key: 'A', description: 'Attention Grabber' },
+  { key: 'S', description: 'Space Tool' },
+  { key: 'Ctrl + F', description: 'Search BPMN Symbol' }
+];
 
 onMounted(() => {
   initializeModeler();
@@ -128,7 +160,18 @@ const BackModeling = () => {
   xml_viewer.value = false;
   UpdateModelingXml();
 }
-
+const zoomIn = () => {
+  if (zoomLevel.value < 3) {
+    zoomLevel.value += 0.1;
+    modeler.get('canvas').zoom(zoomLevel.value);
+  }
+};
+const zoomOut = () => {
+  if (zoomLevel.value > 0.2) {
+    zoomLevel.value -= 0.1;
+    modeler.get('canvas').zoom(zoomLevel.value);
+  }
+};
 const numbers_lines = () => {
   let lines = xmlContent.value.split("\n").length;
   let numbers = "";
@@ -598,5 +641,34 @@ img {
 .numbers-line {
   display: block;
   line-height: 16.6px;
+}
+
+.OptionConfig {
+  position: absolute;
+  right: 15px;
+  bottom: 35px;
+  display: flex;
+  background-color: whitesmoke;
+  gap: 15px;
+  padding: 12px 15px;
+  transition: bottom 0.5s;
+  border-radius: 2px;
+}
+
+.OptionConfig.visible {
+  bottom: 135px;
+}
+
+.keyboard-shortcuts {
+  padding: 15px 20px;
+  ul {
+    padding-top: 15px;
+    padding-left: 9px;
+    li {
+      list-style-type: none;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 }
 </style>
