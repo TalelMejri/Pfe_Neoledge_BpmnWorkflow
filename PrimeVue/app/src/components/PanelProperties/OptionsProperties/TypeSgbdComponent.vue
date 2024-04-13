@@ -1,6 +1,6 @@
 <template>
     <div class="dropdown_content">
-        <Dropdown v-model="type_sgbd" :options="Items"  placeholder="Select  Type SGBD"  />
+        <Dropdown v-model="type_sgbd" :options="Items" @change="AddTypeSgbd()"  placeholder="Select  Type SGBD"  />
     </div>
 </template>
 
