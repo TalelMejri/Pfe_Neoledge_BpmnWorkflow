@@ -97,8 +97,6 @@ import LinterModule from "../LinterElement/index.ts";
 import hljs from 'highlight.js/lib/core';
 import xml from 'highlight.js/lib/languages/xml';
 import minimapModule from 'diagram-js-minimap';
-import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
-import 'diagram-js-minimap/assets/diagram-js-minimap.css';
 hljs.registerLanguage('xml', xml);
 import {
   GetAllErrors,
@@ -120,7 +118,6 @@ let bpmnElementfactory;
 let xml_viewer = ref(false);
 const XmlEdit = ref("XmlEdit");
 const visible = ref(false);
-const minimapVisible = ref(false);
 const keyboardShortcuts = [
   { key: 'Ctrl + Z', description: 'Undo' },
   { key: 'Ctrl + ⇧ + Z', description: 'Redo' },
@@ -163,29 +160,20 @@ const BackModeling = () => {
   xml_viewer.value = false;
   UpdateModelingXml();
 }
+
 const zoomIn = () => {
   if (zoomLevel.value < 3) {
     zoomLevel.value += 0.1;
     modeler.get('canvas').zoom(zoomLevel.value);
   }
 };
+
 const zoomOut = () => {
   if (zoomLevel.value > 0.2) {
     zoomLevel.value -= 0.1;
     modeler.get('canvas').zoom(zoomLevel.value);
   }
 };
-const toggleMinimap = () => {
-  minimapVisible.value = !minimapVisible.value;
-  const minimapContainer = document.querySelector('#minimap-container');
-  const minimapElement = modeler.get('minimap')._parent;
-  if (minimapVisible.value) {
-    minimapContainer.appendChild(minimapElement);
-    console.log(minimapContainer);
-  }
-};
-
-
 
 const numbers_lines = () => {
   let lines = xmlContent.value.split("\n").length;
@@ -221,9 +209,7 @@ const UpdateModelingXml = () => {
     bindModelerEvents();
     fixDuplicateIds(modeler)
     openLocalDiagram(modeler, xmlContentNew);
-    if (minimapVisible) {
-      toggleMinimap()
-    }
+
   });
 }
 
@@ -446,6 +432,8 @@ const ToggleSimulation = () => {
 @import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 @import 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css';
 @import url("~bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css");
+@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+@import '~diagram-js-minimap/assets/diagram-js-minimap.css';
 
 .bts-toggle-mode {
   display: none !important;
