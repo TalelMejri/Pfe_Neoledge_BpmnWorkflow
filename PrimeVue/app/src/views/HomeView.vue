@@ -238,7 +238,7 @@ const initializeModeler = () => {
     keyboard: { bindTo: window },
     additionalModules: [
       gridModule,
-      ColorsBpm,
+     ColorsBpm,
       TokenSimulationModule,
       LinterModule,
       minimapModule
@@ -247,7 +247,6 @@ const initializeModeler = () => {
   });
   bpmnElementRegistry = modeler.get('elementRegistry');
   bpmnElementfactory = modeler.get('bpmnFactory');
-
   bindModelerEvents();
   openLocalDiagram(modeler);
 };

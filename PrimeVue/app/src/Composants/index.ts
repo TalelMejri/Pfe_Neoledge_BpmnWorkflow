@@ -17,6 +17,7 @@ import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import Badge from 'primevue/badge';
 import Dialog from 'primevue/dialog';
+import Toast from 'primevue/toast';
 export const components = {
   Button,
   Calendar,
@@ -35,6 +36,7 @@ export const components = {
   Textarea,
   Dropdown,
   Badge,
-  Dialog
+  Dialog,
+  Toast
 };
 
