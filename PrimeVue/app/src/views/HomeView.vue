@@ -139,12 +139,21 @@ const toast = ref();
 
 onMounted(() => {
   initializeModeler();
+  window.addEventListener('keydown', handleKeyDown);
   toast.value = useToast();
 });
 
 onBeforeMount(() => {
+  window.addEventListener('keydown', handleKeyDown);
   initializeModeler();
 });
+
+const handleKeyDown = (event) => {
+  if (event.ctrlKey && event.key === 's') {
+    event.preventDefault();
+    SaveDiagram();
+  }
+};
 
 const editXML = () => {
   modeler.saveXML({ format: true }, function (err, updatedXml) {
@@ -163,9 +172,11 @@ const editXML = () => {
 
 const BackModeling = () => {
   const xmlContentNew = XmlEdit.value.textContent;
+  toast.value.removeAllGroups();
   if (isValidBPMNXml(xmlContentNew) == true) {
     xml_viewer.value = false;
     UpdateModelingXml(xmlContentNew);
+    toast.value.add({ severity: 'success', summary: 'Success', detail: "Bpmn Code modified with success", life: 3000 });
   } else {
     toast.value.add({ severity: 'error', summary: 'Error', detail: "Invalid BPMN XML", life: 3000 });
   }
