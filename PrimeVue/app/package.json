@@ -25,12 +25,14 @@
     "pretty-data": "^0.40.0",
     "primeicons": "^6.0.1",
     "primevue": "^3.49.1",
+    "timers-browserify": "^2.0.12",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.3",
     "vue3-xml-viewer": "^0.0.14",
     "vuex": "^4.0.0",
-    "xml-formatter": "^3.6.2"
+    "xml-formatter": "^3.6.2",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

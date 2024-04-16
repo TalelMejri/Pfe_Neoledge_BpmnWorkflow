@@ -99,6 +99,7 @@ import LinterModule from "../LinterElement/index.ts";
 import hljs from 'highlight.js/lib/core';
 import xml from 'highlight.js/lib/languages/xml';
 import minimapModule from 'diagram-js-minimap';
+import { parseString } from 'xml2js';
 hljs.registerLanguage('xml', xml);
 import {
   GetAllErrors,
@@ -161,9 +162,33 @@ const editXML = () => {
 }
 
 const BackModeling = () => {
-  xml_viewer.value = false;
-  UpdateModelingXml();
+  const xmlContentNew = XmlEdit.value.textContent;
+  if (isValidBPMNXml(xmlContentNew) == true) {
+    xml_viewer.value = false;
+    UpdateModelingXml(xmlContentNew);
+  } else {
+    toast.value.add({ severity: 'error', summary: 'Error', detail: "Invalid BPMN XML", life: 3000 });
+  }
 }
+
+const isValidBPMNXml = (xmlContent) => {
+  var CheckValid = false;
+  try {
+    parseString(xmlContent, (err, result) => {
+      if (err) {
+        teCheckValidst = false;
+      }
+      if (result && result['definitions']) {
+        CheckValid = true;
+      } else {
+        CheckValid = false;
+      }
+    });
+  } catch (e) {
+    CheckValid = false;
+  }
+  return CheckValid;
+};
 
 const zoomIn = () => {
   if (zoomLevel.value < 3) {
@@ -188,12 +213,11 @@ const numbers_lines = () => {
   return numbers;
 }
 
-const UpdateModelingXml = () => {
-  const xmlContentNew = XmlEdit.value.textContent;
+const UpdateModelingXml = (xmlContentNew) => {
   if (modeler) {
     modeler.destroy();
   }
-  modeler.importXML(xmlContent.value.textContent, function (err) {
+  modeler.importXML(xmlContentNew, function (err) {
     modeler = new Modeler({
       container: canvas.value,
       keyboard: { bindTo: window },
@@ -350,10 +374,10 @@ const importDiagram = () => {
 const handleFileImport = (event) => {
   const file = event.target.files[0];
   const regex = new RegExp('\.(bpmn)$');
-  if (!regex.test(file.type)) {
+  const reader = new FileReader();
+  if (!regex.test(file.name)) {
     toast.value.add({ severity: 'error', summary: 'Error', detail: "File Format should be .bpmn", life: 3000 });
   } else {
-    const reader = new FileReader();
     reader.onload = (e) => {
       if (modeler) {
         modeler.destroy();
@@ -375,10 +399,10 @@ const handleFileImport = (event) => {
       bindModelerEvents();
       openLocalDiagram(modeler, e.target.result);
       ResetDiagramLocal();
+      toast.value.add({ severity: 'success', summary: 'Success', detail: "Diagram Imported", life: 3000 });
     };
-    reader.readAsBinaryString(file);
   }
-
+  reader.readAsBinaryString(file);
 };
 
 const resetDiagram = () => {
