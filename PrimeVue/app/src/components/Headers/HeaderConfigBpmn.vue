@@ -33,7 +33,7 @@ export default defineComponent({
     },
     emits: ['importDiagram', 'BackModeling', 'resetDiagram', 'editXML', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation'],
     setup(props, { emit }) {
-        const toast = ref(null);
+        const toast = ref();
         onMounted(() => {
             toast.value = useToast();
         })
@@ -43,7 +43,7 @@ export default defineComponent({
         const BackModeling = () => {
             emit("BackModeling")
         }
-        const ShowToast = (message) => {
+        const ShowToast = (message:string) => {
             toast.value.removeAllGroups();
             toast.value.add({ severity: 'success', summary: 'Success', detail: message, life: 3000 });
         }
@@ -75,15 +75,12 @@ export default defineComponent({
                     ShowToast("Diagram Reset")
                 }
             },
-
-
             {
                 label: 'Upload',
                 tooltip: "Import Diagram",
                 icon: 'pi pi-upload',
                 command: () => {
                     emit("importDiagram");
-                    ShowToast("Diagram Imported")
                 }
             },
             {

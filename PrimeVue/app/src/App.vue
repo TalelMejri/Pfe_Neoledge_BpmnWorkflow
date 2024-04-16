@@ -8,7 +8,7 @@
   padding: 0;
   margin: 0;
 }
-.p-toast-message.p-toast-message-success {
+.p-toast-message {
   padding: 25px !important;
 }
 </style>

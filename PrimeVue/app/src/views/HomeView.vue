@@ -6,7 +6,8 @@
         @downloadDiagramXml="downloadDiagramXml" @SaveDiagram="SaveDiagram" @downloadDiagramSvg="downloadDiagramSvg"
         @ToggleSimulation="ToggleSimulation" @BackModeling="BackModeling" @editXML="editXML" :xml_viewer="xml_viewer"
         :errors="errors"></HeaderComponentConfig>
-      <input type="file" accept=".bpmn" @change="handleFileImport" ref="fileInput" style="display: none" />
+      <Toast class="toast" position="bottom-center" />
+      <input type="file" @change="handleFileImport" ref="fileInput" style="display: none" />
     </div>
     <div v-if="xml_viewer" class="xml-editor">
       <div class="numbers">
@@ -81,6 +82,7 @@ import {
   ResetDiagramLocal,
   parseBPMNJson,
 } from "../Utils/diagram_util.ts";
+import { useToast } from "primevue/usetoast";
 import HeaderComponent from "../components/Headers/HeaderGenralComponent.vue"
 import HeaderComponentConfig from "../components/Headers/HeaderConfigBpmn.vue"
 import MainPanelComponent from "../components/PanelProperties/MainPanelComponent"
@@ -132,9 +134,11 @@ const keyboardShortcuts = [
   { key: 'S', description: 'Space Tool' },
   { key: 'Ctrl + F', description: 'Search BPMN Symbol' }
 ];
+const toast = ref();
 
 onMounted(() => {
   initializeModeler();
+  toast.value = useToast();
 });
 
 onBeforeMount(() => {
@@ -238,7 +242,7 @@ const initializeModeler = () => {
     keyboard: { bindTo: window },
     additionalModules: [
       gridModule,
-     ColorsBpm,
+      ColorsBpm,
       TokenSimulationModule,
       LinterModule,
       minimapModule
@@ -345,34 +349,36 @@ const importDiagram = () => {
 
 const handleFileImport = (event) => {
   const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    if (modeler) {
-      modeler.destroy();
-    }
-    modeler = new Modeler({
-      container: canvas.value,
-      keyboard: { bindTo: window },
-      additionalModules: [
-        gridModule,
-        ColorsBpm,
-        LinterModule,
-        TokenSimulationModule,
-        minimapModule
-      ],
-      moddleExtensions: { neo: NeoledgeDescriptor }
-    });
+  const regex = new RegExp('\.(bpmn)$');
+  if (!regex.test(file.type)) {
+    toast.value.add({ severity: 'error', summary: 'Error', detail: "File Format should be .bpmn", life: 3000 });
+  } else {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (modeler) {
+        modeler.destroy();
+      }
+      modeler = new Modeler({
+        container: canvas.value,
+        keyboard: { bindTo: window },
+        additionalModules: [
+          gridModule,
+          ColorsBpm,
+          LinterModule,
+          TokenSimulationModule,
+          minimapModule
+        ],
+        moddleExtensions: { neo: NeoledgeDescriptor }
+      });
+      bpmnElementRegistry = modeler.get('elementRegistry');
+      bpmnElementfactory = modeler.get('bpmnFactory');
+      bindModelerEvents();
+      openLocalDiagram(modeler, e.target.result);
+      ResetDiagramLocal();
+    };
+    reader.readAsBinaryString(file);
+  }
 
-
-    bpmnElementRegistry = modeler.get('elementRegistry');
-    bpmnElementfactory = modeler.get('bpmnFactory');
-
-    bindModelerEvents();
-    openLocalDiagram(modeler, e.target.result);
-
-    ResetDiagramLocal();
-  };
-  reader.readAsBinaryString(file);
 };
 
 const resetDiagram = () => {
