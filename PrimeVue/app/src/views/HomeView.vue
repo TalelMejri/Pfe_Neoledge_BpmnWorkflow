@@ -121,6 +121,7 @@ let bpmnElementfactory;
 let xml_viewer = ref(false);
 const XmlEdit = ref("XmlEdit");
 const visible = ref(false);
+
 const keyboardShortcuts = [
   { key: 'Ctrl + Z', description: 'Undo' },
   { key: 'Ctrl + ⇧ + Z', description: 'Redo' },
@@ -133,10 +134,11 @@ const keyboardShortcuts = [
   { key: 'Ctrl + ⇧ + Scrolling', description: 'Scrolling (Horizontal)' },
   { key: 'A', description: 'Attention Grabber' },
   { key: 'S', description: 'Space Tool' },
-  { key: 'Ctrl + F', description: 'Search BPMN Symbol' }
+  { key: 'Ctrl + F', description: 'Search BPMN Symbol' },
+  { key: "Ctrl + S", description: "Save Diagram" }
 ];
-const toast = ref();
 
+const toast = ref();
 onMounted(() => {
   initializeModeler();
   window.addEventListener('keydown', handleKeyDown);
@@ -382,11 +384,18 @@ const importDiagram = () => {
   fileInput.value.click();
 }
 
+const IsValidFileBpmn = (name) => {
+  const regex = new RegExp('\.(bpmn)$');
+  if (!regex.test(name)) {
+    return false;
+  }
+  return true;
+}
+
 const handleFileImport = (event) => {
   const file = event.target.files[0];
-  const regex = new RegExp('\.(bpmn)$');
   const reader = new FileReader();
-  if (!regex.test(file.name)) {
+  if (!IsValidFileBpmn(file.name)) {
     toast.value.add({ severity: 'error', summary: 'Error', detail: "File Format should be .bpmn", life: 3000 });
   } else {
     reader.onload = (e) => {
