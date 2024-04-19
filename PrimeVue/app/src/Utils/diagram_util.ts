@@ -42,6 +42,7 @@ export function RefreshDiagram(modeler:any) {
     });
   });
 }
+
 export function openLocalDiagram(modeler:any, local:any) {
   if (local == null) {
     let localDiagram = localStorage.getItem("savedDiagram");
@@ -50,7 +51,6 @@ export function openLocalDiagram(modeler:any, local:any) {
   } else {
     return openDiagram(modeler, local);
   }
-
 }
 
 export function saveDiagram(modeler:any) {

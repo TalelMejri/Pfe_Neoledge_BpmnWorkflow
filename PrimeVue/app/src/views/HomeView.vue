@@ -434,12 +434,15 @@ const resetDiagram = () => {
 const downloadDiagramXml = () => {
   saveDiagram(toRaw(modeler))
 };
+
 function SaveDiagram() {
   saveDiagramToLocal(modeler);
 }
+
 const downloadDiagramSvg = async () => {
   SaveSvg(modeler);
 };
+
 const ToggleSimulation = () => {
   if (errors.value.length > 0) {
     alert("There are errors in the process. Please fix them before starting the simulation.")
