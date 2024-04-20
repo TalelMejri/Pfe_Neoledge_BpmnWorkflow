@@ -1,9 +1,11 @@
 <template>
     <div class="config">
         <div class="card">
+            <Toast class="toast" position="bottom-center" />
             <Toolbar class="config_content">
                 <template #start>
-                    <Button v-if="!xml_viewer" label="Execution" icon="pi pi-play" iconPos="right" raised @click="ToggleSimulation()" />
+                    <Button v-if="!xml_viewer" label="Execution" icon="pi pi-play" iconPos="right" raised
+                        @click="ToggleSimulation()" />
                 </template>
                 <template #center>
                 </template>
@@ -22,19 +24,28 @@
     </div>
 </template>
 
-<script>
-import { ref, defineComponent } from 'vue'
+<script lang="ts">
+import { ref, defineComponent, onMounted } from 'vue'
+import { useToast } from "primevue/usetoast";
 export default defineComponent({
     props: {
         xml_viewer: Boolean
     },
     emits: ['importDiagram', 'BackModeling', 'resetDiagram', 'editXML', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation'],
     setup(props, { emit }) {
+        const toast = ref();
+        onMounted(() => {
+            toast.value = useToast();
+        })
         const ToggleSimulation = () => {
             emit("ToggleSimulation")
         }
         const BackModeling = () => {
             emit("BackModeling")
+        }
+        const ShowToast = (message:string) => {
+            toast.value.removeAllGroups();
+            toast.value.add({ severity: 'success', summary: 'Success', detail: message, life: 3000 });
         }
         const items = ref([
             {
@@ -43,6 +54,7 @@ export default defineComponent({
                 tooltip: "Download as XML",
                 command: () => {
                     emit("downloadDiagramXml");
+                    ShowToast("Downloaded as XML")
                 }
             },
             {
@@ -51,6 +63,7 @@ export default defineComponent({
                 tooltip: "Save as SVG",
                 command: () => {
                     emit("downloadDiagramSvg")
+                    ShowToast("Downloaded as SVG")
                 }
             },
             {
@@ -59,10 +72,9 @@ export default defineComponent({
                 icon: 'pi pi-refresh',
                 command: () => {
                     emit("resetDiagram")
+                    ShowToast("Diagram Reset")
                 }
             },
-
-
             {
                 label: 'Upload',
                 tooltip: "Import Diagram",
@@ -77,6 +89,7 @@ export default defineComponent({
                 icon: 'pi pi-save',
                 command: () => {
                     emit("SaveDiagram")
+                    ShowToast("Diagram Saved")
                 }
             },
             {
@@ -92,7 +105,8 @@ export default defineComponent({
         return {
             items,
             ToggleSimulation,
-            BackModeling
+            BackModeling,
+            toast
         }
     }
 
@@ -120,6 +134,6 @@ export default defineComponent({
 
 .p-tooltip-text {
     padding: 50px !important;
-
 }
+
 </style>

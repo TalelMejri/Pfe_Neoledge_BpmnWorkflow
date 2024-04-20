@@ -6,7 +6,8 @@
         @downloadDiagramXml="downloadDiagramXml" @SaveDiagram="SaveDiagram" @downloadDiagramSvg="downloadDiagramSvg"
         @ToggleSimulation="ToggleSimulation" @BackModeling="BackModeling" @editXML="editXML" :xml_viewer="xml_viewer"
         :errors="errors"></HeaderComponentConfig>
-      <input type="file" accept=".bpmn" @change="handleFileImport" ref="fileInput" style="display: none" />
+      <Toast class="toast" position="bottom-center" />
+      <input type="file" @change="handleFileImport" ref="fileInput" style="display: none" />
     </div>
     <div v-if="xml_viewer" class="xml-editor">
       <div class="numbers">
@@ -81,6 +82,7 @@ import {
   ResetDiagramLocal,
   parseBPMNJson,
 } from "../Utils/diagram_util.ts";
+import { useToast } from "primevue/usetoast";
 import HeaderComponent from "../components/Headers/HeaderGenralComponent.vue"
 import HeaderComponentConfig from "../components/Headers/HeaderConfigBpmn.vue"
 import MainPanelComponent from "../components/PanelProperties/MainPanelComponent"
@@ -97,8 +99,7 @@ import LinterModule from "../LinterElement/index.ts";
 import hljs from 'highlight.js/lib/core';
 import xml from 'highlight.js/lib/languages/xml';
 import minimapModule from 'diagram-js-minimap';
-import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
-import 'diagram-js-minimap/assets/diagram-js-minimap.css';
+import { parseString } from 'xml2js';
 hljs.registerLanguage('xml', xml);
 import {
   GetAllErrors,
@@ -120,7 +121,7 @@ let bpmnElementfactory;
 let xml_viewer = ref(false);
 const XmlEdit = ref("XmlEdit");
 const visible = ref(false);
-const minimapVisible = ref(false);
+
 const keyboardShortcuts = [
   { key: 'Ctrl + Z', description: 'Undo' },
   { key: 'Ctrl + ⇧ + Z', description: 'Redo' },
@@ -133,16 +134,28 @@ const keyboardShortcuts = [
   { key: 'Ctrl + ⇧ + Scrolling', description: 'Scrolling (Horizontal)' },
   { key: 'A', description: 'Attention Grabber' },
   { key: 'S', description: 'Space Tool' },
-  { key: 'Ctrl + F', description: 'Search BPMN Symbol' }
+  { key: 'Ctrl + F', description: 'Search BPMN Symbol' },
+  { key: "Ctrl + S", description: "Save Diagram" }
 ];
 
+const toast = ref();
 onMounted(() => {
-  initializeModeler();
+ initializeModeler();
+  window.addEventListener('keydown', handleKeyDown);
+  toast.value = useToast();
 });
 
 onBeforeMount(() => {
+  window.addEventListener('keydown', handleKeyDown);
   initializeModeler();
 });
+
+const handleKeyDown = (event) => {
+  if (event.ctrlKey && event.key === 's') {
+    event.preventDefault();
+    SaveDiagram();
+  }
+};
 
 const editXML = () => {
   modeler.saveXML({ format: true }, function (err, updatedXml) {
@@ -160,32 +173,49 @@ const editXML = () => {
 }
 
 const BackModeling = () => {
-  xml_viewer.value = false;
-  UpdateModelingXml();
+  const xmlContentNew = XmlEdit.value.textContent;
+  toast.value.removeAllGroups();
+  if (isValidBPMNXml(xmlContentNew) == true) {
+    xml_viewer.value = false;
+    UpdateModelingXml(xmlContentNew);
+    toast.value.add({ severity: 'success', summary: 'Success', detail: "Bpmn Code modified with success", life: 3000 });
+  } else {
+    toast.value.add({ severity: 'error', summary: 'Error', detail: "Invalid BPMN XML", life: 3000 });
+  }
 }
+
+const isValidBPMNXml = (xmlContent) => {
+  var CheckValid = false;
+  try {
+    parseString(xmlContent, (err, result) => {
+      if (err) {
+        teCheckValidst = false;
+      }
+      if (result && result['definitions']) {
+        CheckValid = true;
+      } else {
+        CheckValid = false;
+      }
+    });
+  } catch (e) {
+    CheckValid = false;
+  }
+  return CheckValid;
+};
+
 const zoomIn = () => {
   if (zoomLevel.value < 3) {
     zoomLevel.value += 0.1;
     modeler.get('canvas').zoom(zoomLevel.value);
   }
 };
+
 const zoomOut = () => {
   if (zoomLevel.value > 0.2) {
     zoomLevel.value -= 0.1;
     modeler.get('canvas').zoom(zoomLevel.value);
   }
 };
-const toggleMinimap = () => {
-  minimapVisible.value = !minimapVisible.value;
-  const minimapContainer = document.querySelector('#minimap-container');
-  const minimapElement = modeler.get('minimap')._parent;
-  if (minimapVisible.value) {
-    minimapContainer.appendChild(minimapElement);
-    console.log(minimapContainer);
-  }
-};
-
-
 
 const numbers_lines = () => {
   let lines = xmlContent.value.split("\n").length;
@@ -196,12 +226,11 @@ const numbers_lines = () => {
   return numbers;
 }
 
-const UpdateModelingXml = () => {
-  const xmlContentNew = XmlEdit.value.textContent;
+const UpdateModelingXml = (xmlContentNew) => {
   if (modeler) {
     modeler.destroy();
   }
-  modeler.importXML(xmlContent.value.textContent, function (err) {
+  modeler.importXML(xmlContentNew, function (err) {
     modeler = new Modeler({
       container: canvas.value,
       keyboard: { bindTo: window },
@@ -221,9 +250,7 @@ const UpdateModelingXml = () => {
     bindModelerEvents();
     fixDuplicateIds(modeler)
     openLocalDiagram(modeler, xmlContentNew);
-    if (minimapVisible) {
-      toggleMinimap()
-    }
+
   });
 }
 
@@ -246,7 +273,7 @@ const fixDuplicateIds = (modeler) => {
   });
 };
 
-const initializeModeler = () => {
+const initializeModeler = async () =>  {
   modeler = new Modeler({
     container: canvas.value,
     keyboard: { bindTo: window },
@@ -261,9 +288,13 @@ const initializeModeler = () => {
   });
   bpmnElementRegistry = modeler.get('elementRegistry');
   bpmnElementfactory = modeler.get('bpmnFactory');
-
   bindModelerEvents();
-  openLocalDiagram(modeler);
+   await WorkfloService.getProcessusById(2).then((res) => {
+    openLocalDiagram(modeler,res.data.codeXml);
+    console.log(res.data.codeXml);
+    //console.log(res.data.codeXml);
+  })
+ 
 };
 
 const bindModelerEvents = () => {
@@ -358,35 +389,44 @@ const importDiagram = () => {
   fileInput.value.click();
 }
 
+const IsValidFileBpmn = (name) => {
+  const regex = new RegExp('\.(bpmn)$');
+  if (!regex.test(name)) {
+    return false;
+  }
+  return true;
+}
+
 const handleFileImport = (event) => {
   const file = event.target.files[0];
   const reader = new FileReader();
-  reader.onload = (e) => {
-    if (modeler) {
-      modeler.destroy();
-    }
-    modeler = new Modeler({
-      container: canvas.value,
-      keyboard: { bindTo: window },
-      additionalModules: [
-        gridModule,
-        ColorsBpm,
-        LinterModule,
-        TokenSimulationModule,
-        minimapModule
-      ],
-      moddleExtensions: { neo: NeoledgeDescriptor }
-    });
-
-
-    bpmnElementRegistry = modeler.get('elementRegistry');
-    bpmnElementfactory = modeler.get('bpmnFactory');
-
-    bindModelerEvents();
-    openLocalDiagram(modeler, e.target.result);
-
-    ResetDiagramLocal();
-  };
+  if (!IsValidFileBpmn(file.name)) {
+    toast.value.add({ severity: 'error', summary: 'Error', detail: "File Format should be .bpmn", life: 3000 });
+  } else {
+    reader.onload = (e) => {
+      if (modeler) {
+        modeler.destroy();
+      }
+      modeler = new Modeler({
+        container: canvas.value,
+        keyboard: { bindTo: window },
+        additionalModules: [
+          gridModule,
+          ColorsBpm,
+          LinterModule,
+          TokenSimulationModule,
+          minimapModule
+        ],
+        moddleExtensions: { neo: NeoledgeDescriptor }
+      });
+      bpmnElementRegistry = modeler.get('elementRegistry');
+      bpmnElementfactory = modeler.get('bpmnFactory');
+      bindModelerEvents();
+      openLocalDiagram(modeler, e.target.result);
+      ResetDiagramLocal();
+      toast.value.add({ severity: 'success', summary: 'Success', detail: "Diagram Imported", life: 3000 });
+    };
+  }
   reader.readAsBinaryString(file);
 };
 
@@ -399,12 +439,15 @@ const resetDiagram = () => {
 const downloadDiagramXml = () => {
   saveDiagram(toRaw(modeler))
 };
+
 function SaveDiagram() {
   saveDiagramToLocal(modeler);
 }
+
 const downloadDiagramSvg = async () => {
   SaveSvg(modeler);
 };
+
 const ToggleSimulation = () => {
   if (errors.value.length > 0) {
     alert("There are errors in the process. Please fix them before starting the simulation.")
@@ -415,9 +458,10 @@ const ToggleSimulation = () => {
         console.error(err);
         return;
       }
-      const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
+      //  const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
       var definitions = modeler.get("canvas").getRootElement().businessObject.$parent;
-      WorkfloService.UploadFile(blob, parseBPMNJson(definitions)).then((res) => {
+      WorkfloService.UploadProcessus(updatedXml, parseBPMNJson(definitions)).then((res) => {
+
         if (res.data.length == 0) {
           return;
         } else {
@@ -446,6 +490,8 @@ const ToggleSimulation = () => {
 @import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 @import 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css';
 @import url("~bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css");
+@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+@import '~diagram-js-minimap/assets/diagram-js-minimap.css';
 
 .bts-toggle-mode {
   display: none !important;
