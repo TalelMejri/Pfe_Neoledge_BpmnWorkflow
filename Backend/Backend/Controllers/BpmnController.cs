@@ -16,7 +16,7 @@ namespace Backend.Controllers
     public class BpmnController : ControllerBase
     {
       //  private System.Threading.Timer timer;
-        FileService _fileService = new FileService();
+        ProcessusService _ProcService = new ProcessusService();
         //private DateTime _lastExecutionTime = DateTime.MinValue;
         private System.Timers.Timer _timer;
         private readonly IWorkflowRunner _workflowRunner;
@@ -28,10 +28,12 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadBpmn([FromForm] IFormFile file, [FromForm] string data)
+        public async Task<IActionResult> UploadBpmn([FromBody] UploadRequest request)
         {
-          //
-              var elements = JsonConvert.DeserializeObject<List<ElementType>>(data);
+            var content = request.Content;
+            var data = request.Data;
+
+            var elements = JsonConvert.DeserializeObject<List<ElementType>>(data);
               var replay = 0;
               var path = "";
               foreach (ElementType element in elements)
@@ -58,21 +60,8 @@ namespace Backend.Controllers
                       }
                   }
               }
-       
-           
-              var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "fileBpmn");
-                  if (!Directory.Exists(directoryPath))
-                      Directory.CreateDirectory(directoryPath);
-
-                  var randomFileName = Guid.NewGuid().ToString() + ".bpmn";
-                  var filePath = Path.Combine(directoryPath, randomFileName);
-
-                  using (var stream = new FileStream(filePath, FileMode.Create))
-                  {
-                      await file.CopyToAsync(stream);
-                  }
-            
-            await _fileService.SaveFileName(randomFileName);
+ 
+            await _ProcService.SaveProcessContent(content);
             var listWorflows = new List<String>();
             if (path=="" && replay == 0)
             {

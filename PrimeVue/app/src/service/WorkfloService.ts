@@ -1,9 +1,19 @@
 import Axios from "axios";
+const API_URL = "http://localhost:5182/api";
 export default {
-    UploadFile(file:any,data:any){
+    getProcessusById(id: any) {
+        return Axios.get(`${API_URL}/processus/${id}`);
+    },
+    UploadProcessus(content: any, data: any) {
         const formData = new FormData();
-        formData.append('file', file);
-        formData.append('data', JSON.stringify(data));
-        return Axios.post("http://localhost:5182/api/bpmn",formData);
+        formData.append('Content', content);
+        formData.append('Data', JSON.stringify(data));
+        return Axios.post(`${API_URL}/bpmn`, formData,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
     }
 }

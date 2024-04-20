@@ -21,21 +21,144 @@ namespace Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Backend.Models.UploadedFile", b =>
+            modelBuilder.Entity("Backend.Models.DateHistory", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FileName")
+                    b.Property<int>("Annee")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Heure")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("id");
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
 
-                    b.ToTable("FileInfo");
+                    b.HasKey("Id");
+
+                    b.ToTable("DateHistories");
+                });
+
+            modelBuilder.Entity("Backend.Models.Diagramme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodeXml")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DateHistoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HistoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DateHistoryId")
+                        .IsUnique();
+
+                    b.HasIndex("HistoryId");
+
+                    b.ToTable("Diagrammes");
+                });
+
+            modelBuilder.Entity("Backend.Models.History", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProcessusId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProcessusId")
+                        .IsUnique();
+
+                    b.ToTable("Histories");
+                });
+
+            modelBuilder.Entity("Backend.Models.Processus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodeXml")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Processus ");
+                });
+
+            modelBuilder.Entity("Backend.Models.Diagramme", b =>
+                {
+                    b.HasOne("Backend.Models.DateHistory", "DateHistory")
+                        .WithOne("Diagramme")
+                        .HasForeignKey("Backend.Models.Diagramme", "DateHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.History", "History")
+                        .WithMany("Diagrammes")
+                        .HasForeignKey("HistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DateHistory");
+
+                    b.Navigation("History");
+                });
+
+            modelBuilder.Entity("Backend.Models.History", b =>
+                {
+                    b.HasOne("Backend.Models.Processus", "Processus")
+                        .WithOne("History")
+                        .HasForeignKey("Backend.Models.History", "ProcessusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Processus");
+                });
+
+            modelBuilder.Entity("Backend.Models.DateHistory", b =>
+                {
+                    b.Navigation("Diagramme")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Models.History", b =>
+                {
+                    b.Navigation("Diagrammes");
+                });
+
+            modelBuilder.Entity("Backend.Models.Processus", b =>
+                {
+                    b.Navigation("History");
                 });
 #pragma warning restore 612, 618
         }

@@ -140,7 +140,7 @@ const keyboardShortcuts = [
 
 const toast = ref();
 onMounted(() => {
-  initializeModeler();
+ initializeModeler();
   window.addEventListener('keydown', handleKeyDown);
   toast.value = useToast();
 });
@@ -273,7 +273,7 @@ const fixDuplicateIds = (modeler) => {
   });
 };
 
-const initializeModeler = () => {
+const initializeModeler = async () =>  {
   modeler = new Modeler({
     container: canvas.value,
     keyboard: { bindTo: window },
@@ -289,7 +289,12 @@ const initializeModeler = () => {
   bpmnElementRegistry = modeler.get('elementRegistry');
   bpmnElementfactory = modeler.get('bpmnFactory');
   bindModelerEvents();
-  openLocalDiagram(modeler);
+   await WorkfloService.getProcessusById(2).then((res) => {
+    openLocalDiagram(modeler,res.data.codeXml);
+    console.log(res.data.codeXml);
+    //console.log(res.data.codeXml);
+  })
+ 
 };
 
 const bindModelerEvents = () => {
@@ -453,9 +458,10 @@ const ToggleSimulation = () => {
         console.error(err);
         return;
       }
-      const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
+      //  const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
       var definitions = modeler.get("canvas").getRootElement().businessObject.$parent;
-      WorkfloService.UploadFile(blob, parseBPMNJson(definitions)).then((res) => {
+      WorkfloService.UploadProcessus(updatedXml, parseBPMNJson(definitions)).then((res) => {
+
         if (res.data.length == 0) {
           return;
         } else {
