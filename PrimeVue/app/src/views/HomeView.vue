@@ -2,10 +2,10 @@
   <div class="home">
     <div>
       <HeaderComponent></HeaderComponent>
-      <HeaderComponentConfig @importDiagram="importDiagram" @resetDiagram="resetDiagram"
+      <HeaderComponentConfig v-if="!ViewerVisible" @importDiagram="importDiagram" @resetDiagram="resetDiagram"
         @downloadDiagramXml="downloadDiagramXml" @SaveDiagram="SaveDiagram" @downloadDiagramSvg="downloadDiagramSvg"
-        @ToggleSimulation="ToggleSimulation" @BackModeling="BackModeling" @editXML="editXML" :xml_viewer="xml_viewer"
-        :errors="errors"></HeaderComponentConfig>
+        @ToggleSimulation="ToggleSimulation" @historyDiagramme="historyDiagramme" @BackModeling="BackModeling"
+        @editXML="editXML" :xml_viewer="xml_viewer" :errors="errors"></HeaderComponentConfig>
       <Toast class="toast" position="bottom-center" />
       <input type="file" @change="handleFileImport" ref="fileInput" style="display: none" />
     </div>
@@ -18,8 +18,28 @@
     <div class="flow-container" v-else>
       <div ref="content" class="containers">
         <div id="canvas" ref="canvas" class="canvas"></div>
+        <div v-if="ViewerVisible" class="properties">
+          <div class="titre">
+            History
+          </div>
+          <div>
+            test1
+          </div>
+          <div>
+            <p v-for="diagram in diagrams" class="diagram_prop" @click="CompareDiagrams(diagram)">
+              {{ diagram.name }}
+              {{ diagram.dateHistory.heure }}
+              {{ diagram.dateHistory.day }}
+              {{ diagram.dateHistory.month }}
+              {{ diagram.dateHistory.annee }}
+            </p>
+          </div>
+          <div class="input-container">
+            show changes
+          </div>
+        </div>
       </div>
-      <div class="OptionConfig" :class="visibleErrors ? 'visible' : ''">
+      <div class="OptionConfig" :id="ViewerVisible ? 'ViewerVisibleTrue' : ''" :class="visibleErrors ? 'visible' : ''">
         <Button icon="pi pi-search-plus" v-tooltip.top="{ value: 'Zoom In', showDelay: 100, hideDelay: 100 }"
           @click="zoomIn" />
         <Button icon="pi pi-search-minus" v-tooltip.top="{ value: 'Zoom out', showDelay: 100, hideDelay: 100 }"
@@ -35,7 +55,7 @@
           </li>
         </ul>
       </Dialog>
-      <div class="card_error" :class="!visibleErrors ? 'visible' : ''">
+      <div v-if="!ViewerVisible" class="card_error" :class="!visibleErrors ? 'visible' : ''">
         <div class="header_error" @click="visibleErrors = !visibleErrors">
           <p>
             Problems <Badge :value="problems.length" severity="danger"></Badge>
@@ -92,6 +112,7 @@ import WorkfloService from "../service/WorkfloService.ts"
 import { DeleteElement, UpdateElement, checkElementStart } from "../GererElement/utils.ts";
 import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
 import ColorsBpm from "../colors/index";
+import Viewer from "../bpmn-js/lib/Viewer.js"
 import Modeler from "../Modeler/CustomBpmnModeler";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
@@ -108,6 +129,7 @@ import {
 const errors = ref(GetAllErrors());
 const problems = ref(GetAllProblems());
 let modeler;
+const ViewerVisible = ref(false);
 const canvas = ref(null);
 const element = ref(null);
 const _active = ref(true);
@@ -116,6 +138,7 @@ const visibleErrors = ref(false);
 const fileInput = ref(null);
 let zoomLevel = ref(1);
 const xmlContent = ref("")
+const diagrams = ref([]);
 let bpmnElementRegistry;
 let bpmnElementfactory;
 let xml_viewer = ref(false);
@@ -140,17 +163,34 @@ const keyboardShortcuts = [
 
 const toast = ref();
 onMounted(() => {
- initializeModeler();
+  initializeModeler();
   window.addEventListener('keydown', handleKeyDown);
   toast.value = useToast();
 });
 
 onBeforeMount(() => {
-  window.addEventListener('keydown', handleKeyDown);
+  // window.addEventListener('keydown', handleKeyDown);
   initializeModeler();
 });
 
 const handleKeyDown = (event) => {
+  // const historyAndDiagramData = {
+  //   DiagrammeName: "Nom du diagramme2",
+  //   DiagrammeCodeXml: ``,
+  //   Heure: "3:00",
+  //   Day: 24,
+  //   Month: 5,
+  //   Annee: 2025,
+  //   Changes: [
+  //     { change: "fdsf 1", IdElement: "ID1sdfsdf" },
+  //     { change: "sdfdsfsd 2", IdElement: "ID2sdfsdf" }
+  //   ]
+  // };
+  // WorkfloService.addHistoryAndDiagramWithChangesToProcessus(2, historyAndDiagramData).then((res) => {
+  //   console.log(res);
+  // }).catch((err) => {
+  //   console.log(err);
+  // });
   if (event.ctrlKey && event.key === 's') {
     event.preventDefault();
     SaveDiagram();
@@ -170,6 +210,25 @@ const editXML = () => {
   });
 
   xml_viewer.value = true;
+}
+
+const CompareDiagrams = (diagram) => {
+  if (modeler) {
+    modeler.destroy();
+  }
+  modeler.importXML(diagram.codeXml, function (err) {
+    modeler = new Viewer({
+      container: canvas.value,
+      keyboard: { bindTo: window },
+      additionalModules: [
+
+      ],
+      moddleExtensions: { neo: NeoledgeDescriptor }
+    });
+
+    openLocalDiagram(modeler, diagram.codeXml);
+
+  });
 }
 
 const BackModeling = () => {
@@ -273,7 +332,7 @@ const fixDuplicateIds = (modeler) => {
   });
 };
 
-const initializeModeler = async () =>  {
+const initializeModeler = async () => {
   modeler = new Modeler({
     container: canvas.value,
     keyboard: { bindTo: window },
@@ -289,13 +348,42 @@ const initializeModeler = async () =>  {
   bpmnElementRegistry = modeler.get('elementRegistry');
   bpmnElementfactory = modeler.get('bpmnFactory');
   bindModelerEvents();
-   await WorkfloService.getProcessusById(2).then((res) => {
-    openLocalDiagram(modeler,res.data.codeXml);
-    console.log(res.data.codeXml);
-    //console.log(res.data.codeXml);
+
+  await WorkfloService.getProcessusById(2).then((res) => {
+    openLocalDiagram(modeler, res.data.codeXml);
+    WorkfloService.getDiagrammesByProcessusHistory(res.data.id).then((res) => {
+      diagrams.value = res.data;
+      console.log(diagrams.value);
+    }).catch((err) => {
+      //console.log(err);
+    });
   })
- 
+
 };
+
+const historyDiagramme = () => {
+  var processus_current = "";
+  ViewerVisible.value = true;
+  modeler.destroy();
+  modeler.saveXML({ format: true }, function (err, updatedXml) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    processus_current = updatedXml;
+  });
+  modeler = new Viewer({
+    container: canvas.value,
+    keyboard: { bindTo: window },
+    additionalModules: [
+
+    ],
+    moddleExtensions: { neo: NeoledgeDescriptor }
+  });
+  bpmnElementRegistry = modeler.get('elementRegistry');
+  bindModelerEvents();
+  openLocalDiagram(modeler, processus_current);
+}
 
 const bindModelerEvents = () => {
   modeler.on('selection.changed', handleSelectionChange);
@@ -739,5 +827,53 @@ img {
       justify-content: space-between;
     }
   }
+}
+
+#ViewerVisibleTrue {
+  right: 350px;
+}
+
+.properties {
+  position: fixed;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow-y: scroll;
+  top: 65px;
+  width: 320px;
+  right: 0;
+  height: 700px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.input-container {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  border-radius: 25px;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  padding: 11px 15px;
+  margin-left: -12px !important;
+  gap: 4px;
+}
+
+.properties {
+  .titre {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 2px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #000;
+  }
+}
+
+.diagram_prop {
+  cursor: pointer;
+  padding: 5px 15px 5px 15px;
+  border-radius: 25px;
+  background-color: whitesmoke;
+  margin-bottom: 12px
 }
 </style>

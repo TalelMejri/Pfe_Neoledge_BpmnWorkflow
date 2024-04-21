@@ -4,12 +4,14 @@ import router from './router'
 import { components } from './Composants/index';
 import 'primevue/resources/themes/aura-light-green/theme.css'
 import 'primeicons/primeicons.css'
-import PrimeVue from 'primevue/config';
-import Tooltip from 'primevue/tooltip';
-import ToastService from 'primevue/toastservice';
-const app = createApp(App).use(PrimeVue).use(ToastService).use(router);
-app.directive('tooltip', Tooltip);
+import PrimeVue from 'primevue/config'
+import Tooltip from 'primevue/tooltip'
+import ToastService from 'primevue/toastservice'
+import { createPinia } from 'pinia'
+const pinia = createPinia()
+const app = createApp(App).use(PrimeVue).use(ToastService).use(pinia).use(router)
+app.directive('tooltip', Tooltip)
 Object.entries(components).forEach(([name, component]) => {
-    app.component(name, component);
+    app.component(name, component)
 });
 app.mount('#app');

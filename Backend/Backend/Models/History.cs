@@ -10,10 +10,11 @@ namespace Backend.Models
         public int Id { get; set; }
 
         public int ProcessusId { get; set; }
-
         [ForeignKey("ProcessusId")]
         public Processus Processus { get; set; }
 
+
         public ICollection<Diagramme> Diagrammes { get; set; }
+       
     }
 }

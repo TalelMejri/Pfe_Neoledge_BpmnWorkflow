@@ -3,7 +3,7 @@ using Backend.Worflows;
 using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.Extensions;
-
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +36,11 @@ builder.Services.AddElsa(elsa =>
     elsa.UseRealTimeWorkflows();
 });
 
-
+builder.Services.AddControllers()
+           .AddJsonOptions(options =>
+           {
+               options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+           });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy", builder =>
@@ -49,7 +53,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 builder.Services.AddControllersWithViews();
-
 
 if (!app.Environment.IsDevelopment())
 {

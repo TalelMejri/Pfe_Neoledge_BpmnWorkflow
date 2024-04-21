@@ -1,4 +1,5 @@
 ﻿using Backend.Models;
+using System.Diagnostics;
 
 namespace Backend.Service
 {
@@ -9,7 +10,8 @@ namespace Backend.Service
         public async Task<int> SaveProcessContent(string code)
         {
              var uploadedProc = new Processus();
-              uploadedProc.CodeXml = code;
+             uploadedProc.CodeXml = code;
+             uploadedProc.History = null;
              _context.Processus.Add(uploadedProc);
              await _context.SaveChangesAsync();
              return uploadedProc.Id; 

@@ -15,5 +15,12 @@ export default {
                 }
             }
         );
+    },
+
+    getDiagrammesByProcessusHistory(id: any) {
+        return Axios.get(`${API_URL}/processus/${id}/Diagrammes`);
+    },
+    addHistoryAndDiagramWithChangesToProcessus(processusId: any, historyAndDiagramData: any) {
+        return Axios.post(`${API_URL}/processus/${processusId}/HistoryAndDiagramWithChanges`, historyAndDiagramData);
     }
 }

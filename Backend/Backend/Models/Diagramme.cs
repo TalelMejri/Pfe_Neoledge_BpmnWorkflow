@@ -19,8 +19,8 @@ namespace Backend.Models
         [ForeignKey("HistoryId")]
         public History History { get; set; }
 
-        public int DateHistoryId { get; set; }
-        [ForeignKey("DateHistoryId")]
         public DateHistory DateHistory { get; set; }
+
+        public ICollection<Changes> ? Changes { get; set; }
     }
 }

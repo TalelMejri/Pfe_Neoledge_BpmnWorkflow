@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Backend.Models
 {
@@ -12,8 +13,8 @@ namespace Backend.Models
 
         [Required]
         public string CodeXml { get; set; }
-
-        public History?  History { get; set; }
+        [JsonIgnore]
+        public History? History { get; set; }
 
     }
 }

@@ -31,7 +31,7 @@ export default defineComponent({
     props: {
         xml_viewer: Boolean
     },
-    emits: ['importDiagram', 'BackModeling', 'resetDiagram', 'editXML', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation'],
+    emits: ['importDiagram', 'BackModeling', 'resetDiagram', 'editXML', 'downloadDiagramXml', 'SaveDiagram', 'downloadDiagramSvg', 'ToggleSimulation','historyDiagramme'],
     setup(props, { emit }) {
         const toast = ref();
         onMounted(() => {
@@ -98,6 +98,14 @@ export default defineComponent({
                 icon: 'pi pi-code',
                 command: () => {
                     emit("editXML")
+                }
+            },
+            {
+                label: 'History',
+                tooltip: "History",
+                icon: 'pi pi-history',
+                command: () => {
+                    emit("historyDiagramme")
                 }
             },
         ])

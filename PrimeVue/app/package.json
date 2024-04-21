@@ -22,6 +22,7 @@
     "lz-string": "1.4.4",
     "min-dash": "^4.2.1",
     "min-dom": "^4.1.0",
+    "pinia": "^2.1.7",
     "pretty-data": "^0.40.0",
     "primeicons": "^6.0.1",
     "primevue": "^3.49.1",

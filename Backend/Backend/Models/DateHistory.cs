@@ -20,7 +20,10 @@ namespace Backend.Models
 
         [Required]
         public int Annee { get; set; }
+        [ForeignKey("DiagrammeId")]
+        public int DiagrammeId { get; set; }
 
         public Diagramme Diagramme { get; set; }
+     
     }
 }

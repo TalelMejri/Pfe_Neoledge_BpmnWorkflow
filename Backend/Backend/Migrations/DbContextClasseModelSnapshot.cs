@@ -21,6 +21,32 @@ namespace Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Backend.Models.Changes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Change")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DiagrammeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IdElement")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiagrammeId");
+
+                    b.ToTable("Changes");
+                });
+
             modelBuilder.Entity("Backend.Models.DateHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -35,6 +61,9 @@ namespace Backend.Migrations
                     b.Property<int>("Day")
                         .HasColumnType("int");
 
+                    b.Property<int>("DiagrammeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Heure")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -43,6 +72,9 @@ namespace Backend.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DiagrammeId")
+                        .IsUnique();
 
                     b.ToTable("DateHistories");
                 });
@@ -59,9 +91,6 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DateHistoryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("HistoryId")
                         .HasColumnType("int");
 
@@ -70,9 +99,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DateHistoryId")
-                        .IsUnique();
 
                     b.HasIndex("HistoryId");
 
@@ -115,21 +141,35 @@ namespace Backend.Migrations
                     b.ToTable("Processus ");
                 });
 
-            modelBuilder.Entity("Backend.Models.Diagramme", b =>
+            modelBuilder.Entity("Backend.Models.Changes", b =>
                 {
-                    b.HasOne("Backend.Models.DateHistory", "DateHistory")
-                        .WithOne("Diagramme")
-                        .HasForeignKey("Backend.Models.Diagramme", "DateHistoryId")
+                    b.HasOne("Backend.Models.Diagramme", "Diagramme")
+                        .WithMany("Changes")
+                        .HasForeignKey("DiagrammeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Diagramme");
+                });
+
+            modelBuilder.Entity("Backend.Models.DateHistory", b =>
+                {
+                    b.HasOne("Backend.Models.Diagramme", "Diagramme")
+                        .WithOne("DateHistory")
+                        .HasForeignKey("Backend.Models.DateHistory", "DiagrammeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Diagramme");
+                });
+
+            modelBuilder.Entity("Backend.Models.Diagramme", b =>
+                {
                     b.HasOne("Backend.Models.History", "History")
                         .WithMany("Diagrammes")
                         .HasForeignKey("HistoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DateHistory");
 
                     b.Navigation("History");
                 });
@@ -145,9 +185,11 @@ namespace Backend.Migrations
                     b.Navigation("Processus");
                 });
 
-            modelBuilder.Entity("Backend.Models.DateHistory", b =>
+            modelBuilder.Entity("Backend.Models.Diagramme", b =>
                 {
-                    b.Navigation("Diagramme")
+                    b.Navigation("Changes");
+
+                    b.Navigation("DateHistory")
                         .IsRequired();
                 });
 
