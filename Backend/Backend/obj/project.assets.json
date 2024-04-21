@@ -13743,19 +13743,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\talel\\.nuget\\packages\\": {}
+    "C:\\Users\\hkimi amin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\talel\\Desktop\\Pfe\\Pfe_Neoledge_BpmnWorkflow\\Backend\\Backend\\Backend.csproj",
+      "projectUniqueName": "C:\\Users\\hkimi amin\\Desktop\\Pfe_Neoledge_BpmnWorkflow\\Backend\\Backend\\Backend.csproj",
       "projectName": "Backend",
-      "projectPath": "C:\\Users\\talel\\Desktop\\Pfe\\Pfe_Neoledge_BpmnWorkflow\\Backend\\Backend\\Backend.csproj",
-      "packagesPath": "C:\\Users\\talel\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\talel\\Desktop\\Pfe\\Pfe_Neoledge_BpmnWorkflow\\Backend\\Backend\\obj\\",
+      "projectPath": "C:\\Users\\hkimi amin\\Desktop\\Pfe_Neoledge_BpmnWorkflow\\Backend\\Backend\\Backend.csproj",
+      "packagesPath": "C:\\Users\\hkimi amin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\hkimi amin\\Desktop\\Pfe_Neoledge_BpmnWorkflow\\Backend\\Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\talel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\hkimi amin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -13855,6 +13855,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.26, 6.0.26]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[6.0.26, 6.0.26]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.26, 6.0.26]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.26, 6.0.26]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -13863,7 +13881,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }
