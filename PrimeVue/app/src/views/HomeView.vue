@@ -31,36 +31,40 @@
             <span class="comment-date"> <Button @click="AddHistory()">ADD</Button></span>
           </div>
           <div class="d-flex justify-content-between align-items-center comment-text">
-            <div @click="CompareDiagrams(DiagramFN.Diagram['DiagrammeCodeXml'])" class="diagram_prop">
+            <div @click="CompareDiagrams(DiagramFN.Diagram['DiagrammeCodeXml'], 'history')" class="diagram_prop">
               {{ DiagramFN.Diagram['Heure'] }}
             </div>
 
           </div>
           <hr>
           <div>
-            <p v-for="diagram in diagrams" class="diagram_prop" @click="CompareDiagrams(diagram.codeXml)">
+            <p v-for="diagram in diagrams" class="diagram_prop"
+              @click="CompareDiagrams(diagram.codeXml, 'compare', diagram)">
             <div class="comment-header">
               <span class="comment-user">{{ diagram.name }}</span>
               <span class="comment-date"> {{ diagram.dateHistory.heure }}</span>
             </div>
             <div class="d-flex justify-content-between align-items-center comment-text">
-              <!-- <div class="p-2">
-                            {{ CommentValue.comment }}
-                        </div> 
-                        -->
               <div>
                 {{ diagram.dateHistory.heure }}
               </div>
             </div>
-            <!-- {{ diagram.dateHistory.heure }}
-              {{ diagram.dateHistory.day }}
-              {{ diagram.dateHistory.month }}
-              {{ diagram.dateHistory.annee }}
-               -->
             </p>
           </div>
-          <div class="input-container">
+          <!-- <div class="input-container">
             show changes
+          </div> -->
+        </div>
+        <div v-if="VisibleChanged">
+          <div class="properties_left">
+              <div class="titre">
+                  Changed
+              </div>
+              <div v-for="change in changed">
+                 <div class="diagram_prop">
+                      {{ change.change }} in element with id {{ change.idElement }}
+                 </div>
+              </div>
           </div>
         </div>
       </div>
@@ -138,6 +142,7 @@ import { DeleteElement, UpdateElement, checkElementStart } from "../GererElement
 import { ref, onMounted, toRaw, onBeforeMount, onServerPrefetch } from 'vue';
 import ColorsBpm from "../colors/index";
 import Viewer from "../bpmn-js/lib/Viewer.js"
+
 import Modeler from "../Modeler/CustomBpmnModeler";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
@@ -153,9 +158,11 @@ import {
   GetAllProblems
 } from "../LinterElement/GererError.ts";
 import { DiagramChanges } from "../store/index.ts";
+import $ from 'jquery';
 const errors = ref(GetAllErrors());
 const problems = ref(GetAllProblems());
 let modeler;
+const changed = ref([]);
 const ViewerVisible = ref(false);
 const canvas = ref(null);
 const element = ref(null);
@@ -168,6 +175,7 @@ let zoomLevel = ref(1);
 const xmlContent = ref("")
 const diagrams = ref([]);
 let bpmnElementRegistry;
+const VisibleChanged = ref(false);
 let bpmnElementfactory;
 let xml_viewer = ref(false);
 const XmlEdit = ref("XmlEdit");
@@ -224,43 +232,47 @@ const editXML = () => {
 }
 
 const AddHistory = () => {
-  // const historyAndDiagramData = {
-  //   DiagrammeName: "Nom du diagramme2",
-  //   DiagrammeCodeXml: ``,
-  //   Heure: "3:00",
-  //   Day: 24,
-  //   Month: 5,
-  //   Annee: 2025,
-  //   Changes: [
-  //     { change: "fdsf 1", IdElement: "ID1sdfsdf" },
-  //     { change: "sdfdsfsd 2", IdElement: "ID2sdfsdf" }
-  //   ]
-  // };
   WorkfloService.addHistoryAndDiagramWithChangesToProcessus(2, DiagramFN.Diagram).then((res) => {
     DiagramFN.DeleteChanges();
+    WorkfloService.getDiagrammesByProcessusHistory(2).then((res) => {
+      diagrams.value = res.data;
+    }).catch((err) => {
+      console.log(err);
+    });
   }).catch((err) => {
     console.log(err);
   });
 }
 
-const CompareDiagrams = (diagram) => {
+const CompareDiagrams = (diagram, type, diagrams) => {
   if (modeler) {
     modeler.destroy();
   }
+  modeler = new Viewer({
+    container: canvas.value,
+  });
   modeler.importXML(diagram, function (err) {
-    modeler = new Viewer({
-      container: canvas.value,
-      keyboard: { bindTo: window },
-      additionalModules: [
-
-      ],
-      moddleExtensions: { neo: NeoledgeDescriptor }
-    });
-
+    if (err) {
+      console.error(err);
+      return;
+    }
     openLocalDiagram(modeler, diagram);
-
+    // const overlays = modeler.get('overlays');
+    // const bpmnElementRegistry = modeler.get('elementRegistry');
+    if (type === 'compare') {
+      // const $overlay = `
+      //   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-check-circle">
+      //     <circle cx="12" cy="12" r="10"></circle>
+      //     <path d="M9 12l2 2 4-4"></path>
+      //   </svg>`;
+      diagrams.changes.forEach((val) => {
+        changed.value.push(val);
+      });
+      VisibleChanged.value = true;
+    }
   });
 }
+
 
 const BackModeling = () => {
   const xmlContentNew = XmlEdit.value.textContent;
@@ -333,14 +345,11 @@ const UpdateModelingXml = (xmlContentNew) => {
       ],
       moddleExtensions: { neo: NeoledgeDescriptor }
     });
-
     bpmnElementRegistry = modeler.get('elementRegistry');
     bpmnElementfactory = modeler.get('bpmnFactory');
-
     bindModelerEvents();
     fixDuplicateIds(modeler)
     openLocalDiagram(modeler, xmlContentNew);
-
   });
 }
 
@@ -379,13 +388,12 @@ const initializeModeler = async () => {
   bpmnElementRegistry = modeler.get('elementRegistry');
   bpmnElementfactory = modeler.get('bpmnFactory');
   bindModelerEvents();
-
   await WorkfloService.getProcessusById(2).then((res) => {
     openLocalDiagram(modeler, res.data.codeXml);
     WorkfloService.getDiagrammesByProcessusHistory(res.data.id).then((res) => {
       diagrams.value = res.data;
     }).catch((err) => {
-      //console.log(err);
+      console.log(err);
     });
   })
 };
@@ -418,21 +426,19 @@ const bindModelerEvents = () => {
 };
 
 const test = (event) => {
-  ChangeHistoryDiagram();
   const newShape = event.element;
   const existingShapes = modeler.get('elementRegistry').getAll();
   const shapeExists = existingShapes.some(shape => shape.id === newShape.id);
   if (!shapeExists) {
     lastAddedShapeId = newShape;
-    DiagramFN.AddChange({
-      'change': 'Add ' + lastAddedShapeId.type.split(':')[1],
-      'IdElement': lastAddedShapeId.id
-    });
+    // DiagramFN.AddChange({
+    //   'change': 'Add ' + lastAddedShapeId.type.split(':')[1],
+    //   'IdElement': lastAddedShapeId.id
+    // });
   }
 }
 
 const ChangeHistoryDiagram = () => {
-
   modeler.saveXML({ format: true }, function (err, updatedXml) {
     if (err) {
       console.error(err);
@@ -451,7 +457,7 @@ const updateActivityName = newName => {
   if (element && element.value) {
     const elementNew = bpmnElementRegistry.get(element.value[3]["id"]);
     modeler.get('modeling').updateProperties(elementNew, { name: newName });
-    DiagramFN.AddChange({ 'change': 'Add Label' + newName, 'IdElement': element.value[3]["id"] })
+    DiagramFN.AddChange({ 'change': 'Add Label ' + newName, 'IdElement': element.value[3]["id"] })
   } else {
     console.log('null');
   }
@@ -906,6 +912,27 @@ img {
   height: 700px;
   padding: 10px;
   background-color: #f9f9f9;
+}
+
+.properties_left {
+  position: fixed;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow-y: scroll;
+  top: 65px;
+  width: 320px;
+  left: 0;
+  height: 700px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  .titre{
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 2px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #000;
+  }
 }
 
 .input-container {

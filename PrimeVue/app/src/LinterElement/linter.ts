@@ -6,6 +6,7 @@ import { BpmnEvent } from '../bpmn-js/lib/core';
 import { ELEMENT_CHANGED_EVENT } from 'bpmn-js-token-simulation/lib/util/EventHelper';
 import { getErrorById, GetAllErrors } from "./GererError"
 import { ErrorBpmn } from "./BpmnRules";
+
 const colorImageSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon">
     <polygon points="6 2 18 2 22 6 22 18 18 22 6 22 2 18 2 6 6 2"></polygon>

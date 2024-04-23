@@ -37,7 +37,12 @@ export const DiagramChanges = defineStore('DiagramChanges', {
         AddChange(change: Change) {
             const existingDiagram = JSON.parse(localStorage.getItem("Diagram") || 'null');
             if (existingDiagram) {
-                existingDiagram.Changes.push(change);
+                const index = existingDiagram.Changes.findIndex((e: any) => e.IdElement === change.IdElement && change.change.includes("Label"));
+                if (index != -1) {
+                    existingDiagram.Changes[index] = change;
+                } else {
+                    existingDiagram.Changes.push(change);
+                }
                 const currentDate = new Date();
                 existingDiagram.Heure = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
                 existingDiagram.Day = currentDate.getDate();
@@ -47,7 +52,7 @@ export const DiagramChanges = defineStore('DiagramChanges', {
                 this.Diagram = existingDiagram;
             }
         },
-        DeleteChanges(){
+        DeleteChanges() {
             const existingDiagram = JSON.parse(localStorage.getItem("Diagram") || 'null');
             if (existingDiagram) {
                 existingDiagram.Changes = [];
