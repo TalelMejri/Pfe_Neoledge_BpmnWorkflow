@@ -45,7 +45,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            var diagrammes = processus.History.Diagrammes.ToList();
+            var diagrammes = processus.History.Diagrammes.OrderByDescending(d => d.Id).ToList();
 
             return diagrammes;
         }

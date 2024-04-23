@@ -23,15 +23,40 @@
             History
           </div>
           <div>
-            test1
+            Unplished {{ DiagramFN.Diagram['Day'] }} / {{ DiagramFN.Diagram['Month'] }} / {{
+              DiagramFN.Diagram['Annee'] }}
           </div>
+          <div class="comment-header">
+            <span class="comment-user">Latest Version</span>
+            <span class="comment-date"> <Button @click="AddHistory()">ADD</Button></span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center comment-text">
+            <div @click="CompareDiagrams(DiagramFN.Diagram['DiagrammeCodeXml'])" class="diagram_prop">
+              {{ DiagramFN.Diagram['Heure'] }}
+            </div>
+
+          </div>
+          <hr>
           <div>
-            <p v-for="diagram in diagrams" class="diagram_prop" @click="CompareDiagrams(diagram)">
-              {{ diagram.name }}
-              {{ diagram.dateHistory.heure }}
+            <p v-for="diagram in diagrams" class="diagram_prop" @click="CompareDiagrams(diagram.codeXml)">
+            <div class="comment-header">
+              <span class="comment-user">{{ diagram.name }}</span>
+              <span class="comment-date"> {{ diagram.dateHistory.heure }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center comment-text">
+              <!-- <div class="p-2">
+                            {{ CommentValue.comment }}
+                        </div> 
+                        -->
+              <div>
+                {{ diagram.dateHistory.heure }}
+              </div>
+            </div>
+            <!-- {{ diagram.dateHistory.heure }}
               {{ diagram.dateHistory.day }}
               {{ diagram.dateHistory.month }}
               {{ diagram.dateHistory.annee }}
+               -->
             </p>
           </div>
           <div class="input-container">
@@ -110,7 +135,7 @@ import TokenSimulationModule from 'bpmn-js-token-simulation/lib/modeler.js';
 import { toggleMode } from "../SimulationNeo/util.ts"
 import WorkfloService from "../service/WorkfloService.ts"
 import { DeleteElement, UpdateElement, checkElementStart } from "../GererElement/utils.ts";
-import { ref, onMounted, toRaw, onBeforeMount } from 'vue';
+import { ref, onMounted, toRaw, onBeforeMount, onServerPrefetch } from 'vue';
 import ColorsBpm from "../colors/index";
 import Viewer from "../bpmn-js/lib/Viewer.js"
 import Modeler from "../Modeler/CustomBpmnModeler";
@@ -121,11 +146,13 @@ import hljs from 'highlight.js/lib/core';
 import xml from 'highlight.js/lib/languages/xml';
 import minimapModule from 'diagram-js-minimap';
 import { parseString } from 'xml2js';
+
 hljs.registerLanguage('xml', xml);
 import {
   GetAllErrors,
   GetAllProblems
 } from "../LinterElement/GererError.ts";
+import { DiagramChanges } from "../store/index.ts";
 const errors = ref(GetAllErrors());
 const problems = ref(GetAllProblems());
 let modeler;
@@ -133,6 +160,7 @@ const ViewerVisible = ref(false);
 const canvas = ref(null);
 const element = ref(null);
 const _active = ref(true);
+const DiagramFN = DiagramChanges();
 const visibleRight = ref(false);
 const visibleErrors = ref(false);
 const fileInput = ref(null);
@@ -162,6 +190,7 @@ const keyboardShortcuts = [
 ];
 
 const toast = ref();
+
 onMounted(() => {
   initializeModeler();
   window.addEventListener('keydown', handleKeyDown);
@@ -169,28 +198,10 @@ onMounted(() => {
 });
 
 onBeforeMount(() => {
-  // window.addEventListener('keydown', handleKeyDown);
   initializeModeler();
 });
 
 const handleKeyDown = (event) => {
-  // const historyAndDiagramData = {
-  //   DiagrammeName: "Nom du diagramme2",
-  //   DiagrammeCodeXml: ``,
-  //   Heure: "3:00",
-  //   Day: 24,
-  //   Month: 5,
-  //   Annee: 2025,
-  //   Changes: [
-  //     { change: "fdsf 1", IdElement: "ID1sdfsdf" },
-  //     { change: "sdfdsfsd 2", IdElement: "ID2sdfsdf" }
-  //   ]
-  // };
-  // WorkfloService.addHistoryAndDiagramWithChangesToProcessus(2, historyAndDiagramData).then((res) => {
-  //   console.log(res);
-  // }).catch((err) => {
-  //   console.log(err);
-  // });
   if (event.ctrlKey && event.key === 's') {
     event.preventDefault();
     SaveDiagram();
@@ -212,11 +223,31 @@ const editXML = () => {
   xml_viewer.value = true;
 }
 
+const AddHistory = () => {
+  // const historyAndDiagramData = {
+  //   DiagrammeName: "Nom du diagramme2",
+  //   DiagrammeCodeXml: ``,
+  //   Heure: "3:00",
+  //   Day: 24,
+  //   Month: 5,
+  //   Annee: 2025,
+  //   Changes: [
+  //     { change: "fdsf 1", IdElement: "ID1sdfsdf" },
+  //     { change: "sdfdsfsd 2", IdElement: "ID2sdfsdf" }
+  //   ]
+  // };
+  WorkfloService.addHistoryAndDiagramWithChangesToProcessus(2, DiagramFN.Diagram).then((res) => {
+    DiagramFN.DeleteChanges();
+  }).catch((err) => {
+    console.log(err);
+  });
+}
+
 const CompareDiagrams = (diagram) => {
   if (modeler) {
     modeler.destroy();
   }
-  modeler.importXML(diagram.codeXml, function (err) {
+  modeler.importXML(diagram, function (err) {
     modeler = new Viewer({
       container: canvas.value,
       keyboard: { bindTo: window },
@@ -226,7 +257,7 @@ const CompareDiagrams = (diagram) => {
       moddleExtensions: { neo: NeoledgeDescriptor }
     });
 
-    openLocalDiagram(modeler, diagram.codeXml);
+    openLocalDiagram(modeler, diagram);
 
   });
 }
@@ -353,12 +384,10 @@ const initializeModeler = async () => {
     openLocalDiagram(modeler, res.data.codeXml);
     WorkfloService.getDiagrammesByProcessusHistory(res.data.id).then((res) => {
       diagrams.value = res.data;
-      console.log(diagrams.value);
     }).catch((err) => {
       //console.log(err);
     });
   })
-
 };
 
 const historyDiagramme = () => {
@@ -367,7 +396,6 @@ const historyDiagramme = () => {
   modeler.destroy();
   modeler.saveXML({ format: true }, function (err, updatedXml) {
     if (err) {
-      console.error(err);
       return;
     }
     processus_current = updatedXml;
@@ -375,25 +403,55 @@ const historyDiagramme = () => {
   modeler = new Viewer({
     container: canvas.value,
     keyboard: { bindTo: window },
-    additionalModules: [
-
-    ],
+    additionalModules: [],
     moddleExtensions: { neo: NeoledgeDescriptor }
   });
-  bpmnElementRegistry = modeler.get('elementRegistry');
-  bindModelerEvents();
   openLocalDiagram(modeler, processus_current);
+  processus_current = "";
 }
 
 const bindModelerEvents = () => {
   modeler.on('selection.changed', handleSelectionChange);
   modeler.on('element.click', handleElementChange);
+  modeler.on('element.changed', ChangeHistoryDiagram);
+  modeler.on('shape.added', test);
 };
+
+const test = (event) => {
+  ChangeHistoryDiagram();
+  const newShape = event.element;
+  const existingShapes = modeler.get('elementRegistry').getAll();
+  const shapeExists = existingShapes.some(shape => shape.id === newShape.id);
+  if (!shapeExists) {
+    lastAddedShapeId = newShape;
+    DiagramFN.AddChange({
+      'change': 'Add ' + lastAddedShapeId.type.split(':')[1],
+      'IdElement': lastAddedShapeId.id
+    });
+  }
+}
+
+const ChangeHistoryDiagram = () => {
+
+  modeler.saveXML({ format: true }, function (err, updatedXml) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    DiagramFN.AddDiagram(
+      {
+        DiagrammeCodeXml: updatedXml,
+        DiagrammeName: "Nom du diagramme",
+      }
+    )
+  });
+}
 
 const updateActivityName = newName => {
   if (element && element.value) {
     const elementNew = bpmnElementRegistry.get(element.value[3]["id"]);
     modeler.get('modeling').updateProperties(elementNew, { name: newName });
+    DiagramFN.AddChange({ 'change': 'Add Label' + newName, 'IdElement': element.value[3]["id"] })
   } else {
     console.log('null');
   }
@@ -427,6 +485,7 @@ const updateProperty = (newName, NewValue, name, value) => {
 const handleSelectionChange = (event) => {
   const selectedElement = event.newSelection[0];
   if (selectedElement !== undefined) {
+    ChangeHistoryDiagram();
     // const eventBus = modeler.get('eventBus');
     // eventBus.fire('tokenSimulation.simulator.elementChanged', { true: true });
     checkElementStart([selectedElement.id, selectedElement.labels, selectedElement.type, selectedElement.businessObject]);
@@ -453,6 +512,9 @@ const RefreshDiagram = () => {
   });
 }
 
+onServerPrefetch(async () => {
+  await store.fetchData()
+})
 
 const CheckStatus = (element) => {
   if (element[3]["status"] == undefined) {
@@ -546,7 +608,7 @@ const ToggleSimulation = () => {
         console.error(err);
         return;
       }
-      //  const blob = new Blob([updatedXml], { type: 'application/bpmn20-xml;charset=utf-8' });
+      //const blob = new Blob([updatedXml],{type:'application/bpmn20-xml;charset=utf-8'});
       var definitions = modeler.get("canvas").getRootElement().businessObject.$parent;
       WorkfloService.UploadProcessus(updatedXml, parseBPMNJson(definitions)).then((res) => {
 
@@ -875,5 +937,28 @@ img {
   border-radius: 25px;
   background-color: whitesmoke;
   margin-bottom: 12px
+}
+
+
+.comment-header {
+  display: flex;
+  margin-top: 9px;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.comment-user {
+  font-weight: bold;
+}
+
+.comment-date {
+  color: #666;
+}
+
+.comment-text {
+  padding: 5px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 </style>

@@ -1,5 +1,5 @@
 import { toRaw } from "vue";
-
+import { DiagramChanges } from "../store/index";
 export function createElement(type: string, properties: any, bpmnFactory: any) {
     const element = bpmnFactory.create(type, properties);
     return element;
@@ -88,6 +88,8 @@ export function AddElementComposer(
     typeName: any,
     name: any, value: any
 ) {
+    const Diagram = DiagramChanges();
+
     const businessObject = toRaw(element[3]);
     let ItemParent = businessObject.get("extensionElements");
 
@@ -122,6 +124,7 @@ export function AddElementComposer(
     }
 
     ChildItem.get(ValuesChild).push(ChildItemValue);
+    Diagram.AddChange({ 'change': 'Add ' + TypeChild.split(':')[1], 'IdElement': element[0] })
 }
 
 
@@ -131,6 +134,7 @@ export function AddElement(element: any,
     typeName: string,
     value: any
 ) {
+    const Diagram = DiagramChanges();
     const businessObject = toRaw(element[3]);
     let extensionElements = businessObject.get('extensionElements');
     if (!extensionElements) {
@@ -176,6 +180,7 @@ export function AddElement(element: any,
         } else if (typeName == 'time') {
             childElement.time = value;
         }
+        Diagram.AddChange({ 'change': 'Add ' + TypeChild.split(':')[1], 'IdElement': element[0] })
     }
 }
 
@@ -251,6 +256,7 @@ export function DeleteElement(
 }
 
 export function UpdateElement(element: any, TypeChild: any, ValuesChild: any, TypeName: any, name: any, value: any, newName: any, newValue: any, val: any) {
+    const Diagram = DiagramChanges();
     const businessObject = val ? toRaw(element[3]) : toRaw(element.value[3]);
     let extensionElements = businessObject.get('extensionElements');
     let BaseElement = extensionElements.get('values').find((e: any) => e.$type === TypeChild);
@@ -262,7 +268,6 @@ export function UpdateElement(element: any, TypeChild: any, ValuesChild: any, Ty
     } else {
         var res = BaseElement.get(ValuesChild).find((e: any) => e.source === name && e.target === value);
     }
-
     if (res) {
         if (TypeName == "name") {
             res.name = newName;
@@ -274,6 +279,7 @@ export function UpdateElement(element: any, TypeChild: any, ValuesChild: any, Ty
             res.source = newName;
             res.target = newValue;
         }
+        Diagram.AddChange({ 'change': 'Modify ' + TypeChild.split(':')[1], 'IdElement': element[0] })
     } else {
         console.log('Not found');
     }
