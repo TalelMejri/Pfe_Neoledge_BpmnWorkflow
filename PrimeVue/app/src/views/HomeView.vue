@@ -34,7 +34,6 @@
             <div @click="CompareDiagrams(DiagramFN.Diagram['DiagrammeCodeXml'], 'history')" class="diagram_prop">
               {{ DiagramFN.Diagram['Heure'] }}
             </div>
-
           </div>
           <hr>
           <div>
@@ -57,14 +56,14 @@
         </div>
         <div v-if="VisibleChanged">
           <div class="properties_left">
-              <div class="titre">
-                  Changed
+            <div class="titre">
+              Changed
+            </div>
+            <div v-for="change in changed">
+              <div class="diagram_prop">
+                {{ change.change }} in element with id {{ change.idElement }}
               </div>
-              <div v-for="change in changed">
-                 <div class="diagram_prop">
-                      {{ change.change }} in element with id {{ change.idElement }}
-                 </div>
-              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -142,7 +141,6 @@ import { DeleteElement, UpdateElement, checkElementStart } from "../GererElement
 import { ref, onMounted, toRaw, onBeforeMount, onServerPrefetch } from 'vue';
 import ColorsBpm from "../colors/index";
 import Viewer from "../bpmn-js/lib/Viewer.js"
-
 import Modeler from "../Modeler/CustomBpmnModeler";
 import gridModule from 'diagram-js-grid';
 import NeoledgeDescriptor from '../descriptor/NeoledgeDescriptor.json';
@@ -232,9 +230,9 @@ const editXML = () => {
 }
 
 const AddHistory = () => {
-  WorkfloService.addHistoryAndDiagramWithChangesToProcessus(2, DiagramFN.Diagram).then((res) => {
+  WorkfloService.addHistoryAndDiagramWithChangesToProcessus(23, DiagramFN.Diagram).then((res) => {
     DiagramFN.DeleteChanges();
-    WorkfloService.getDiagrammesByProcessusHistory(2).then((res) => {
+    WorkfloService.getDiagrammesByProcessusHistory(23).then((res) => {
       diagrams.value = res.data;
     }).catch((err) => {
       console.log(err);
@@ -300,7 +298,7 @@ const isValidBPMNXml = (xmlContent) => {
       }
     });
   } catch (e) {
-    CheckValid = false;
+    CheckValid = true;
   }
   return CheckValid;
 };
@@ -388,14 +386,17 @@ const initializeModeler = async () => {
   bpmnElementRegistry = modeler.get('elementRegistry');
   bpmnElementfactory = modeler.get('bpmnFactory');
   bindModelerEvents();
-  await WorkfloService.getProcessusById(2).then((res) => {
-    openLocalDiagram(modeler, res.data.codeXml);
-    WorkfloService.getDiagrammesByProcessusHistory(res.data.id).then((res) => {
-      diagrams.value = res.data;
-    }).catch((err) => {
-      console.log(err);
-    });
-  })
+  openLocalDiagram(modeler);
+  /* 
+  await WorkfloService.getProcessusById(23).then((res) => {
+     openLocalDiagram(modeler, res.data.codeXml);
+     WorkfloService.getDiagrammesByProcessusHistory(res.data.id).then((res) => {
+       diagrams.value = res.data;
+     }).catch((err) => {
+       console.log(err);
+     });
+   })
+  */
 };
 
 const historyDiagramme = () => {
@@ -422,21 +423,21 @@ const bindModelerEvents = () => {
   modeler.on('selection.changed', handleSelectionChange);
   modeler.on('element.click', handleElementChange);
   modeler.on('element.changed', ChangeHistoryDiagram);
-  modeler.on('shape.added', test);
+  // modeler.on('shape.added', test);
 };
 
-const test = (event) => {
-  const newShape = event.element;
-  const existingShapes = modeler.get('elementRegistry').getAll();
-  const shapeExists = existingShapes.some(shape => shape.id === newShape.id);
-  if (!shapeExists) {
-    lastAddedShapeId = newShape;
-    // DiagramFN.AddChange({
-    //   'change': 'Add ' + lastAddedShapeId.type.split(':')[1],
-    //   'IdElement': lastAddedShapeId.id
-    // });
-  }
-}
+// const test = (event) => {
+//   const newShape = event.element;
+//   const existingShapes = modeler.get('elementRegistry').getAll();
+//   const shapeExists = existingShapes.some(shape => shape.id === newShape.id);
+//   if (!shapeExists) {
+//     lastAddedShapeId = newShape;
+//     // DiagramFN.AddChange({
+//     //   'change': 'Add ' + lastAddedShapeId.type.split(':')[1],
+//     //   'IdElement': lastAddedShapeId.id
+//     // });
+//   }
+// }
 
 const ChangeHistoryDiagram = () => {
   modeler.saveXML({ format: true }, function (err, updatedXml) {
@@ -617,7 +618,6 @@ const ToggleSimulation = () => {
       //const blob = new Blob([updatedXml],{type:'application/bpmn20-xml;charset=utf-8'});
       var definitions = modeler.get("canvas").getRootElement().businessObject.$parent;
       WorkfloService.UploadProcessus(updatedXml, parseBPMNJson(definitions)).then((res) => {
-
         if (res.data.length == 0) {
           return;
         } else {
@@ -802,9 +802,9 @@ const ToggleSimulation = () => {
   height: 100%;
 }
 
-.bjs-powered-by {
+/*.bjs-powered-by {
   display: none;
-}
+}*/
 
 img {
   width: 50px;
@@ -925,7 +925,8 @@ img {
   height: 700px;
   padding: 10px;
   background-color: #f9f9f9;
-  .titre{
+
+  .titre {
     font-size: 18px;
     font-weight: bold;
     text-align: center;

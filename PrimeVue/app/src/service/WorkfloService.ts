@@ -16,7 +16,6 @@ export default {
             }
         );
     },
-
     getDiagrammesByProcessusHistory(id: any) {
         return Axios.get(`${API_URL}/processus/${id}/Diagrammes`);
     },
